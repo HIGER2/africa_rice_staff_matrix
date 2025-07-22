@@ -1,0 +1,83 @@
+{
+  "__plugin-vue_export-helper-DlAUqK2U.js": {
+    "file": "assets/_plugin-vue_export-helper-DlAUqK2U.js",
+    "name": "_plugin-vue_export-helper"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Dlj44cjV.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/Pages/Home.vue": {
+    "file": "assets/Home-BgFka3yD.js",
+    "name": "Home",
+    "src": "resources/js/Pages/Home.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/Pages/components/TableOne.vue",
+      "resources/js/app.js",
+      "__plugin-vue_export-helper-DlAUqK2U.js"
+    ]
+  },
+  "resources/js/Pages/components/TableOne.vue": {
+    "file": "assets/TableOne-BwtT1ypp.js",
+    "name": "TableOne",
+    "src": "resources/js/Pages/components/TableOne.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "__plugin-vue_export-helper-DlAUqK2U.js"
+    ],
+    "css": [
+      "assets/TableOne-CERmW476.css"
+    ]
+  },
+  "resources/js/Pages/components/TableTwo.vue": {
+    "file": "assets/TableTwo-0QsNWkfE.js",
+    "name": "TableTwo",
+    "src": "resources/js/Pages/components/TableTwo.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/components/TableTwo2 copy.vue": {
+    "file": "assets/TableTwo2 copy-nSo-EPAT.js",
+    "name": "TableTwo2 copy",
+    "src": "resources/js/Pages/components/TableTwo2 copy.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "__plugin-vue_export-helper-DlAUqK2U.js"
+    ],
+    "css": [
+      "assets/TableTwo2 copy-mayOku7s.css"
+    ]
+  },
+  "resources/js/Pages/components/TableTwo2.vue": {
+    "file": "assets/TableTwo2-CkxEhExk.js",
+    "name": "TableTwo2",
+    "src": "resources/js/Pages/components/TableTwo2.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "__plugin-vue_export-helper-DlAUqK2U.js"
+    ],
+    "css": [
+      "assets/TableTwo2-DBnFk1DI.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-ZTUnDF1m.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/Pages/Home.vue",
+      "resources/js/Pages/components/TableOne.vue",
+      "resources/js/Pages/components/TableTwo.vue",
+      "resources/js/Pages/components/TableTwo2 copy.vue",
+      "resources/js/Pages/components/TableTwo2.vue"
+    ]
+  }
+}
