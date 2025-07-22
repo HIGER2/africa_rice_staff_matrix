@@ -8,4 +8,5 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [AppController::class, 'index']);
+Route::post('/time-allocations', [AppController::class, 'addAllocation']);
 
