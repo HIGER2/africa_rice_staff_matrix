@@ -400,11 +400,11 @@ import { onMounted, reactive, ref, watch } from 'vue'
                 <div class="flex-1 overflow-y-auto" v-if="selectedRow.timeAllocations.length>0">
                     <div class="w-full " v-for="(items, index) in selectedRow.timeAllocations" :key="index">
                         <!-- {{ selectedRow.timeAllocations[index]['year'] }} -->
-                        <div v-if="selectedRow.timeAllocations[index]['date']" class="w-full flex items-center gap-1">
+                        <!-- <div v-if="selectedRow.timeAllocations[index]['date']" class="w-full flex items-center gap-1">
                             <div class="w-full rounded-full  h-[1px] bg-gray-300"></div>
                             <div class="min-w-max">{{ selectedRow.timeAllocations[index]['date'] }}</div>
                             <div class="w-full  rounded-full h-[1px] bg-gray-300"></div>
-                        </div>
+                        </div> -->
                         <div 
                         :class="[
                                 ' borders flex gap-2 borders-gray-200  w-full',
@@ -424,7 +424,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
 
                                         <!-- input au-dessus -->
                                         <input
-                                        type="number"
+                                        :type="(key=='agreement' || key=='bus') ?'text' :'number'"
                                         min="0"
                                         max="100"
                                         :disabled="key=='total'"
