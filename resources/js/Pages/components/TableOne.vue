@@ -274,7 +274,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     originalStaffData.value  = props.staff.map((items) => ({
     employeeId:items.employeeId,
     resno: items.resno || 'N/A',
-    name: items?.lastName?.toLocaleLowerCase() +' '+items?.name.toLocaleLowerCase(),
+    name: items?.lastName?.toLowerCase() +' '+items?.name.toLowerCase(),
     position: items.position || 'N/A',
     grade_level: items.grade_level || 'N/A',
     grade: items.grade || 'N/A',
@@ -284,7 +284,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     division: items.division || 'N/A',
     unit_program: items.unit_program || 'N/A',
     supervisor: items.supervisor
-    ? `${items.supervisor.firstName || ''} ${items.supervisor.lastName || ''}`.trim() || 'N/A'
+    ? `${items.supervisor.firstName.toLowerCase() || ''} ${items.supervisor.lastName.toLowerCase() || ''}`.trim() || 'N/A'
     : 'N/A',
     timeAllocations: items.time_allocations
   }))
@@ -399,9 +399,9 @@ import { onMounted, reactive, ref, watch } from 'vue'
             <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
                     <div class="w-full relative">
                         <div class="w-full flex items-center gap-2 text-[14px] py-3">
-                            <h2 class=" font-semibold mb-4">Staff Time Allocation : <span class="capitalize"> {{ selectedRow.name  }}</span> </h2>
-                            <h2 class=" font-semibold mb-4">Supervisor : <span class="capitalize"> {{  selectedRow.supervisor  }}</span> </h2>
-                            <h2 class=" font-semibold mb-4">Year : <span class="capitalize">2025</span> </h2>
+                            <h2 class=" font-semibold mb-4 uppercase">Staff Time Allocation : <span class="capitalize text-gray-600"> {{ selectedRow.name  }}</span> </h2>
+                            <h2 class=" font-semibold mb-4 uppercase">Supervisor : <span class="capitalize text-gray-600"> {{  selectedRow.supervisor  }}</span> </h2>
+                            <h2 class=" font-semibold mb-4 uppercase">Year : <span class="capitalize text-gray-600">2025</span> </h2>
                         </div>
                         <button 
                             @click="closeModal"
@@ -413,8 +413,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
                            + Add new
                         </button>
                         <div class="w-full flex items-center gap-2">
-                            <div class="borders flex gap-2 borders-gray-200  w-full"
-                        >
+                            <div class="borders flex gap-2 borders-gray-200  w-full">
                             <div :class="[
                                 'flex w-full  items-start p-2 rounded-md  cursor-pointer hover:bg-blue-50',
                             ] ">
