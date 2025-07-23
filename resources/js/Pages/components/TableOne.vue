@@ -401,7 +401,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
                         <div class="w-full flex items-center gap-2 text-[14px] py-3">
                             <h2 class=" font-semibold mb-4 uppercase">Staff Time Allocation : <span class="capitalize text-gray-600"> {{ selectedRow.name  }}</span> </h2>
                             <h2 class=" font-semibold mb-4 uppercase">Supervisor : <span class="capitalize text-gray-600"> {{  selectedRow.supervisor  }}</span> </h2>
-                            <h2 class=" font-semibold mb-4 uppercase">Year : <span class="capitalize text-gray-600">2025</span> </h2>
+                            <h2 class=" font-semibold mb-4 uppercase">Year : <span class="capitalize text-gray-600">{{ new Date().getFullYear() }}</span> </h2>
                         </div>
                         <button 
                             @click="closeModal"

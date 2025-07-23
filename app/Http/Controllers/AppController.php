@@ -37,7 +37,9 @@ class AppController extends Controller
                         'dec',
                         'date',
                         'total'
-                    )->orderBy('created_at', 'desc');
+                    )
+                    ->whereYear('date', Carbon::now()->year) // 👈 filtre année actuelle
+                    ->orderBy('created_at', 'desc');
                 },
                 'supervisor' => function ($query) {
                     $query->select('employeeId', 'firstName', 'lastName');

@@ -1,1 +1,0 @@
-import t from"./TableOne-orRZkUq9.js";import{d as a,c as o,o as r}from"./app-DK4kfLmi.js";import"./_plugin-vue_export-helper-DlAUqK2U.js";const p=a({__name:"Home",props:{staff:Array},setup(e){return(f,s)=>(r(),o(t,{staff:e.staff},null,8,["staff"]))}});export{p as default};
