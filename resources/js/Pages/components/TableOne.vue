@@ -57,7 +57,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
         oct: 'OCT',
         nov: 'NOV',
         dec: 'DEC',
-       
     }
     const content = {
     agreement: 'AGREEMENT',
@@ -186,6 +185,10 @@ import { onMounted, reactive, ref, watch } from 'vue'
     const morthTotal=(data,key)=>{
 
         // console.log(data,key);
+        if (exClude.includes(key)) {
+            
+            return ''
+        }
         const item = data.reduce((acc,val)=>{
             if (val[key]) {
                 acc += Number(val[key])
@@ -194,6 +197,14 @@ import { onMounted, reactive, ref, watch } from 'vue'
             // return Object.keys(item)[index]==key 
         },0)
         return `${item}%`
+    }
+
+    const labelTotal=(label,key)=>{
+        if (exClude.includes(key)) {
+            return ''
+        }
+
+        return label
     }
 
     function addRow() {
@@ -215,13 +226,27 @@ import { onMounted, reactive, ref, watch } from 'vue'
         .then(response => {
             alert('Allocations saved successfully')
             console.log('Allocations saved successfully', response.data.data.time_allocations)
+            let indexOfStaff = staffData.value.findIndex(item => item.employeeId == items.employeeId);
+            staffData.value[indexOfStaff] = {
+                    ...items,
+                    timeAllocations: [...response.data.data.time_allocations]
+            };
+            let indexOf = originalStaffData.value.findIndex(item => item.employeeId == items.employeeId);
+            originalStaffData.value[indexOf] = {
+                    ...items,
+                    timeAllocations: [...response.data.data.time_allocations]
+            };
+            
             selectedRow.value.timeAllocations = [...response.data.data.time_allocations]
-            loading.value = false
         })
         .catch(error => {
             alert('Error saving allocations')
             console.error('Error saving allocations:', error.response?.data || error.message)
+           
+        })
+        .finally(() => {
             loading.value = false
+            // closeModal()
         })
     }
 
@@ -249,7 +274,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     originalStaffData.value  = props.staff.map((items) => ({
     employeeId:items.employeeId,
     resno: items.resno || 'N/A',
-    name: items.name  + ' ' + items.lastName,
+    name: items?.lastName?.toLocaleLowerCase() +' '+items?.name.toLocaleLowerCase(),
     position: items.position || 'N/A',
     grade_level: items.grade_level || 'N/A',
     grade: items.grade || 'N/A',
@@ -372,18 +397,45 @@ import { onMounted, reactive, ref, watch } from 'vue'
         <!-- Modal -->
         <div v-if="selectedRow"  class="fixed p-10 w-full inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
             <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
-                    <div class="w-full">
-                        <h2 class="text-lg font-semibold mb-4">Staff Time Allocation : {{ selectedRow.name  }} </h2>
+                    <div class="w-full relative">
+                        <div class="w-full flex items-center gap-2 text-[14px] py-3">
+                            <h2 class=" font-semibold mb-4">Staff Time Allocation : <span class="capitalize"> {{ selectedRow.name  }}</span> </h2>
+                            <h2 class=" font-semibold mb-4">Supervisor : <span class="capitalize"> {{  selectedRow.supervisor  }}</span> </h2>
+                            <h2 class=" font-semibold mb-4">Year : <span class="capitalize">2025</span> </h2>
+                        </div>
+                        <button 
+                            @click="closeModal"
+                            class="p-2 absolute top-0 right-2 text-2xl cursor-pointer">
+                            <i class="uil uil-times">
+                            </i>
+                        </button>
                         <button @click="addRow" class="p-1 px-2 mb-2  bg-green-500 text-white  cursor-pointer rounded hover:bg-green-400">
                            + Add new
                         </button>
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-2">
+                            <div class="borders flex gap-2 borders-gray-200  w-full"
+                        >
+                            <div :class="[
+                                'flex w-full  items-start p-2 rounded-md  cursor-pointer hover:bg-blue-50',
+                            ] ">
+                                <div class="w-full flex  justify-center gap-1  font-bold text-[11px]"   v-for="(label, key) in content">
+                                    <span class="text-green-500">{{labelTotal(label,key)}}</span>
+                                    <transition 
+                                    name="fade-slide"
+                                            mode="out-in"
+                                    >
+                                            <span :key="morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase())">
+                                                {{ morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase()) }}
+                                            </span>
+                                    </transition>
+                                </div>
+                            </div>
+                        </div>
                             <!-- <span>Statistic:</span> -->
-                            <div 
-                            v-for="(month, mIndex) in morth" :key="mIndex"
-                            class="flex items-center gap-1 py-3 font-medium text-[12px]">
+                            <!-- <div 
+                            v-for="(month, mIndex) in content" :key="mIndex"
+                            class="flex items-center border w-full py-3 font-medium text-[12px]">
                                 <span class="text-green-500">{{ month}} :</span>
-                                <!-- <span>{{ morthTotal(selectedRow.timeAllocations,'jan') }}</span> -->
                                 <transition 
                                 name="fade-slide"
                                         mode="out-in"
@@ -392,7 +444,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
                                             {{ morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase()) }}
                                         </span>
                                 </transition>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 <!-- <pre> {{ selectedRow }}</pre> -->
@@ -406,11 +458,10 @@ import { onMounted, reactive, ref, watch } from 'vue'
                             <div class="w-full  rounded-full h-[1px] bg-gray-300"></div>
                         </div> -->
                         <div 
-                        :class="[
-                                ' borders flex gap-2 borders-gray-200  w-full',
-                            ]"
+                        class="borders flex gap-2 borders-gray-200  w-full"
                         >
-                            <div :class="['flex w-full  items-start p-2 rounded-md  cursor-pointer  mb-2 hover:bg-blue-50',
+                            <div :class="[
+                                'flex w-full  items-start p-2 rounded-md  cursor-pointer  mb-2 hover:bg-blue-50',
                                 !selectedRow.timeAllocations?.[index]?.id ? 'bg-red-50' : 'bg-gray-100 '
                             ] ">
                                 <div class="w-full text-center"   v-for="(label, key) in content">

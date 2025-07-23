@@ -126,7 +126,7 @@ class AppController extends Controller
             ->first();
         $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
             return [
-                'Year' => $allocation->year ?? 'N/A',
+                // 'Year' => $allocation->year ?? 'N/A',
                 'Agreement' => $allocation->agreement,
                 'Bus' => $allocation->bus,
                 'Jan' => $allocation->jan,
@@ -142,7 +142,7 @@ class AppController extends Controller
                 'Nov' => $allocation->nov,
                 'Dec' => $allocation->dec,
                 'Total' => $allocation->total,
-                'Date' => $allocation->date,
+                // 'Date' => $allocation->date,
             ];
         })->toArray();
 
