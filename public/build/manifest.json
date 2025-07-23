@@ -4,12 +4,12 @@
     "name": "_plugin-vue_export-helper"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B_kG2721.css",
+    "file": "assets/app-0HjLuB_7.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/Pages/Home.vue": {
-    "file": "assets/Home-BGQ-AAER.js",
+    "file": "assets/Home-C2TsACev.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.vue",
     "isDynamicEntry": true,
@@ -20,7 +20,7 @@
     ]
   },
   "resources/js/Pages/components/TableOne.vue": {
-    "file": "assets/TableOne-Ctz3GGQK.js",
+    "file": "assets/TableOne-BN77tkyI.js",
     "name": "TableOne",
     "src": "resources/js/Pages/components/TableOne.vue",
     "isDynamicEntry": true,
@@ -29,11 +29,11 @@
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ],
     "css": [
-      "assets/TableOne-CEvXeGf0.css"
+      "assets/TableOne-CPlPSnZf.css"
     ]
   },
   "resources/js/Pages/components/TableTwo.vue": {
-    "file": "assets/TableTwo-BcZa-JRZ.js",
+    "file": "assets/TableTwo-BRjdZnha.js",
     "name": "TableTwo",
     "src": "resources/js/Pages/components/TableTwo.vue",
     "isDynamicEntry": true,
@@ -42,7 +42,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2 copy.vue": {
-    "file": "assets/TableTwo2 copy-eCdJN13J.js",
+    "file": "assets/TableTwo2 copy-D64U-AJF.js",
     "name": "TableTwo2 copy",
     "src": "resources/js/Pages/components/TableTwo2 copy.vue",
     "isDynamicEntry": true,
@@ -55,7 +55,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2.vue": {
-    "file": "assets/TableTwo2-CMQmDtGX.js",
+    "file": "assets/TableTwo2-BepHxfwi.js",
     "name": "TableTwo2",
     "src": "resources/js/Pages/components/TableTwo2.vue",
     "isDynamicEntry": true,
@@ -68,7 +68,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-C2ksssR9.js",
+    "file": "assets/app-gs0z9HPd.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

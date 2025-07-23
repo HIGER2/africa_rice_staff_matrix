@@ -537,7 +537,9 @@ import { onMounted, reactive, ref, watch } from 'vue'
                             cancel
                         </button>
                         <button class="px-3 py-1 cursor-pointer border-0 bg-blue-600 text-white rounded hover:bg-blue-700" @click="saveRow">
-                            <div v-if="loading" >Processing...</div>
+                            <div v-if="loading" class="flex items-center gap-1" >
+                                <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Processing...</div>
                             <span v-else> Save now</span>
                         </button>
                 </div>
