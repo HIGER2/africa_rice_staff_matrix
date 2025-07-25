@@ -4,15 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TimeAllocation extends Model
+class monthlyTotal extends Model
 {
-    // $guarded = [];
         protected $fillable = [
         'id',             // <- à ajouter
         'employeeId',
-        'year',
-        'agreement',
         'date',
+        'year',
         'bus',
         'jan',
         'feb',

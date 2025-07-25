@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\TimeAllocationUpdatedMail;
 use App\Models\Employee;
+use App\Models\monthlyTotal;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,6 +24,28 @@ class AppController extends Controller
                         'employeeId', // pour la relation timeAllocations
                         'agreement',
                         'bus',
+                        'jan',
+                        'feb',
+                        'mar',
+                        'apr',
+                        'may',
+                        'jun',
+                        'jul',
+                        'aug',
+                        'sep',
+                        'oct',
+                        'nov',
+                        'dec',
+                        'date',
+                        'total'
+                    )
+                    ->whereYear('date', Carbon::now()->year) // 👈 filtre année actuelle
+                    ->orderBy('created_at', 'desc');
+                },
+                'monthlyTotal' => function ($query) {
+                    $query->select(
+                        'id',
+                        'employeeId', // pour la relation timeAllocations
                         'jan',
                         'feb',
                         'mar',
@@ -68,6 +91,8 @@ class AppController extends Controller
     {
         $allocations = $request->timeAllocations;
         $employeeId = $request->employeeId;
+        $monthlyTotal = $request->monthlyTimeTotal;
+        $year = Carbon::now()->year;
 
         // return response()->json(['message' => $employeeId]);
 
@@ -82,13 +107,24 @@ class AppController extends Controller
 
         foreach ($allocations as $value) {
             $value['year'] = date('Y');
-            $value['date'] = Carbon::now()->toDateString();
             $value['employeeId'] = $employeeId;
             $employee->timeAllocations()->updateOrCreate(
-            ['id' => $value['id'] ?? null, 'employeeId' => $employeeId],
-            $value
-        );
+                ['id' => $value['id'] ?? null, 
+                'employeeId' => $employeeId,
+                'year'=>$year
+                ],
+                $value
+            );
         }
+
+        monthlyTotal::updateOrCreate(
+            [
+            'employeeId' => $employeeId,
+            'year'=>$year
+            ],
+            $monthlyTotal
+        );
+        
         // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
         $employee = Employee::select(
                 'employeeId',
@@ -102,8 +138,9 @@ class AppController extends Controller
                 'phone2 as division',
                 'jobTitle as position'
             )
-            ->with(['timeAllocations' => function ($query) {
-                $query->select(
+            ->with([
+                'timeAllocations' => function ($query) {
+                    $query->select(
                     'id',
                     'employeeId',
                     'agreement',
@@ -123,9 +160,33 @@ class AppController extends Controller
                     'date',
                     'total'
                 )->orderBy('created_at', 'desc');
-            }])
+                
+            },
+            'monthlyTotal' => function ($query) {
+                    $query->select(
+                        'id',
+                        'employeeId', // pour la relation timeAllocations
+                        'jan',
+                        'feb',
+                        'mar',
+                        'apr',
+                        'may',
+                        'jun',
+                        'jul',
+                        'aug',
+                        'sep',
+                        'oct',
+                        'nov',
+                        'dec',
+                        'date',
+                        'total'
+                    )
+                    ->whereYear('date', Carbon::now()->year) ;
+                }
+            ])
             ->where('employeeId', $employeeId)
             ->first();
+
         $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
             return [
                 // 'Year' => $allocation->year ?? 'N/A',
@@ -147,14 +208,13 @@ class AppController extends Controller
                 // 'Date' => $allocation->date,
             ];
         })->toArray();
-
         
             $supervisorEmail = $employee->supervisor->email ?? null;
             $mail = Mail::to($employee->email);
             if ($supervisorEmail) {
                 $mail->cc($supervisorEmail);
             }
-            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
+            // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
         
         return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
     }

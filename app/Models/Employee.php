@@ -14,8 +14,13 @@ class Employee extends Model
     return $this->hasMany(TimeAllocation::class, 'employeeId', 'employeeId');
     }
 
-   public function supervisor()
-{
-    return $this->belongsTo(Employee::class, 'supervisorId', 'employeeId');
-}
+    public function supervisor()
+    {
+        return $this->belongsTo(Employee::class, 'supervisorId', 'employeeId');
+    }
+
+    public function monthlyTotal()
+    {
+        return $this->belongsTo(monthlyTotal::class,'employeeId', 'employeeId');
+    }
 }
