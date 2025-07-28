@@ -293,9 +293,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
             return
         }
         let items = {...selectedRow.value}  
-
-        console.log(items);
-        
         // let monthly_time_totals = calculateMonthlyTotals(items.timeAllocations)
         
         loading.value =true
@@ -354,9 +351,10 @@ import { onMounted, reactive, ref, watch } from 'vue'
     }
     function getColor(value ,key){
         let per = key=='total' ? 1200 : 100
-        return  value < per ? 'text-blue-500' :
-            value > per ?  'text-red-500' :
-            'text-green-500'
+
+        return  value < per ? 'bg-blue-500' :
+            value > per ?  'bg-red-500' :
+            'bg-green-300'
     }
     watch(search, (value) => {
     const lowerVal = value.toLowerCase()
@@ -368,9 +366,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
 
     
     onMounted(()=>{
-
-        console.log(props.staff[0]);
-        
     originalStaffData.value  = props.staff.map((items) => ({
     employeeId:items.employeeId,
     resno: items.resno || 'N/A',
@@ -497,7 +492,9 @@ import { onMounted, reactive, ref, watch } from 'vue'
         </div>
 
         <!-- Modal -->
-        <div v-if="selectedRow"  class="fixed p-10 w-full inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
+        <div v-if="selectedRow" 
+        @click.self="closeModal"
+        class="fixed p-10 w-full inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
             <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
                     <div class="w-full relative">
                         <div class="w-full flex items-center gap-2 text-[14px] py-3">
@@ -521,16 +518,16 @@ import { onMounted, reactive, ref, watch } from 'vue'
                             ] ">
                             <!-- <pre> {{ selectedRow.monthlyTotal }}</pre> -->
 
-                                <div v-if="selectedRow.monthlyTotal" class="w-full flex  justify-center gap-1  font-bold text-[11px]"  
+                                <div v-if="selectedRow.monthlyTotal" class="w-full flex items-center  justify-center gap-1  text-[11px]"  
                                 v-for="(label, key) in content">
-                                    <span :class="
-                                    getColor(selectedRow.monthlyTotal[key],key)
-                                    ">{{labelTotal(label,key)}}</span>
+                                    <span class="font-bold ">{{labelTotal(label,key)}}</span>
                                     <transition 
                                     name="fade-slide"
                                             mode="out-in"
                                     >
-                                    <span :key="selectedRow.monthlyTotal[key]">
+                                    <span 
+                                    :class="[getColor(selectedRow.monthlyTotal[key],key),' px-1 font-medium']"
+                                    :key="selectedRow.monthlyTotal[key]">
                                             {{morthTotal(selectedRow.monthlyTotal[key],key)}}
                                     </span>
                                         <!-- <span :key="morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase())">
@@ -596,27 +593,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
                                         class="relative z-10 w-full h-full border text-center  text-sm border-gray-300  focus:outline-none focus:ring-2 focus:rounded-md focus:ring-green-500 focus:border-green-500"
                                         />
                                     </div>
-                                    <!-- <input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    @input="(event)=>getRowTotal(event.target.value,index)"
-                                    v-model="selectedRow.timeAllocations[index][key]"
-                                    :disabled="key=='total'"
-                                    :class="[
-                                        {'bg-green-300': key=='total'},
-                                    ]"
-                                    class=" 
-                                    border text-center
-                                    after:w-full
-                                    after:h-full
-                                    after:content-['']
-                                    after:absolute
-                                    after:inset-0
-                                    after:z-10
-                                    after:bg-amber-100
-                                    border-gray-300 w-full p-1 text-sm focus:outline-none focus:ring-2 focus:rounded-md focus:ring-green-500 focus:border-green-500"
-                                    /> -->
                                     <transition
                                         name="fade-slide"
                                         mode="out-in"
