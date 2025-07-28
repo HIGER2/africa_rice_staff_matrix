@@ -275,7 +275,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     }
     
     function calculateMonthlyTotals(data) {
-        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
         const result = {};
         let grandTotal = 0;
 
