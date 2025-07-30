@@ -9,7 +9,11 @@ import { onMounted, reactive, ref, watch } from 'vue'
     })
     let staffData = ref([])
     const originalStaffData = ref([])
-    let loading = ref(false)
+    let loading = reactive({
+        send: false,
+        save: false
+    })
+
     let search =ref('')
     const exClude= ['id','employeeId','agreement','bus','year','date','total']
     const keys = ['id','employeeId','agreement','bus','year','date',
@@ -289,13 +293,13 @@ import { onMounted, reactive, ref, watch } from 'vue'
     }
 
     function saveRow(index) {
-        if (!confirm('Confirm ?')) {
-            return
+        if (!confirm('Are you sure you want to save these changes?')) {
+            return;
         }
         let items = {...selectedRow.value}  
         // let monthly_time_totals = calculateMonthlyTotals(items.timeAllocations)
         
-        loading.value =true
+            loading.save =true
         axios.post('/time-allocations', {
             employeeId: items.employeeId,
             timeAllocations: items.timeAllocations,
@@ -327,10 +331,32 @@ import { onMounted, reactive, ref, watch } from 'vue'
         .catch(error => {
             alert('Error saving allocations')
             console.error('Error saving allocations:', error.response?.data || error.message)
-           
         })
         .finally(() => {
-            loading.value = false
+            loading.save = false
+            // closeModal()
+        })
+    }
+
+    function sendMail(index) {
+
+        if (!confirm('Do you really want to deny this email?')) {
+            return;
+        }
+
+        loading.send =true
+        let items = {...selectedRow.value}  
+        axios.post('/send-mail', {
+            employeeId: items.employeeId,
+        })
+        .then(response => {
+            alert('Allocations send successfully')
+        })
+        .catch(error => {
+            alert('Error send allocations')
+        })
+        .finally(() => {
+            loading.send = false
             // closeModal()
         })
     }
@@ -625,8 +651,14 @@ import { onMounted, reactive, ref, watch } from 'vue'
                         <button class="px-3 p-1  cursor-pointer  bg-gray-100 border border-gray-300  rounded hover:bg-gray-400" @click="closeModal">
                             cancel
                         </button>
-                        <button class="px-3 py-1 cursor-pointer border-0 bg-blue-600 text-white rounded hover:bg-blue-700" @click="saveRow">
-                            <div v-if="loading" class="flex items-center gap-1" >
+                        <button class="px-3 py-1 cursor-pointer border-0 bg-blue-600 text-white rounded hover:bg-blue-700" @click="sendMail">
+                            <div v-if="loading.send" class="flex items-center gap-1" >
+                                <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Processing...</div>
+                            <span v-else> Send now</span>
+                        </button>
+                        <button class="px-3 py-1 cursor-pointer border-0 bg-green-500 text-white rounded hover:bg-green-700" @click="saveRow">
+                            <div v-if="loading.save" class="flex items-center gap-1" >
                                 <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
                                 Processing...</div>
                             <span v-else> Save now</span>

@@ -17,7 +17,7 @@ class TimeAllocationSeeder extends Seeder
      */
     public function run(): void
     {
-        $filePath = public_path('file.xlsx');
+        $filePath = public_path('file3.xlsx');
         // $rows = Excel::toArray([], $filePath);
         // $sheet = $rows[0];       // la première feuille
         // $header = $sheet[0];  
@@ -73,7 +73,7 @@ class TimeAllocationSeeder extends Seeder
         // }
 
         $data = [];
-
+        $new =[];
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
 
@@ -95,7 +95,29 @@ class TimeAllocationSeeder extends Seeder
 
         
         function timeAllocation($data){
-            $resno = $data[1];
+            $employeeData = array_slice($data,1,11);
+            $timeAllocation = array_slice($data,12);
+
+            $parts = explode(',', $employeeData[1]);
+            $lastName = trim($parts[0]); // Nom de famille
+            $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
+            $employeeData=[
+                "matricule"=> $employeeData[0],
+                "firstName"=>$firstName ,
+                "lastName"=> $lastName ,
+                "password"=>"" ,
+                "jobTitle"=> $employeeData[2] ,
+                "bgLevel"=> $employeeData[3] ,
+                "grade"=> $employeeData[4] ,
+                "organization"=> $employeeData[5] ,
+                "country_of_residence"=> $employeeData[6] ,
+                "base_station"=> $employeeData[7] ,
+                "division"=> $employeeData[8] ,
+                "unit_organisation"=> $employeeData[9] ,
+                "email"=>$employeeData[0]
+            ];
+
+            // $resno = $data[1];
             // if ($resno !== 'A10552') {
             //         return;
             //     }
@@ -106,8 +128,16 @@ class TimeAllocationSeeder extends Seeder
                 }
             }
 
-            $employee = Employee::where('matricule', $resno)->first(); 
-            // $employee = TimeAllocation::where('matricule', $resno)->first(); 
+            $employee = Employee::updateOrCreate(
+                ['matricule'=>$employeeData['matricule']],
+                $employeeData
+            ); 
+            // email
+            // lastName
+            // password
+            if ($employee->wasRecentlyCreated) {
+                $new[] = $employee;
+            }
 
             if ($employee) {
                 $agreement = $data[12] ?? null;
@@ -146,45 +176,47 @@ class TimeAllocationSeeder extends Seeder
 
         }
 
-        // var_dump(count($data));
         foreach ($data as $key=> $row) {
-          timeAllocation($row);
-          var_dump($key);
+            if ($key == 0 || $key==1) continue;
+            timeAllocation($row);
+        //   var_dump($key);
+        // break;
         }
 
+        // var_dump($new);
 
-        function monthlyTota(){
-            $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        // function monthlyTota(){
+        //     $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-            function calculateMonthlyTotals(array $data, array $months): array {
-                $result = array_fill_keys($months, 0);
-                $grandTotal = 0;
+        //     function calculateMonthlyTotals(array $data, array $months): array {
+        //         $result = array_fill_keys($months, 0);
+        //         $grandTotal = 0;
 
-                foreach ($data as $item) {
-                    foreach ($months as $month) {
-                        $value = isset($item[$month]) ? (float)$item[$month] : 0;
-                        $result[$month] += $value;
-                        $grandTotal += $value;
-                    }
-                }
+        //         foreach ($data as $item) {
+        //             foreach ($months as $month) {
+        //                 $value = isset($item[$month]) ? (float)$item[$month] : 0;
+        //                 $result[$month] += $value;
+        //                 $grandTotal += $value;
+        //             }
+        //         }
 
-                $result['total'] = $grandTotal;
-                return $result;
-            }
+        //         $result['total'] = $grandTotal;
+        //         return $result;
+        //     }
 
-            $employees = Employee::with('timeAllocations')
-            ->has('timeAllocations') // s'assure que l'employé a des timeAllocations
-            ->get();
+        //     $employees = Employee::with('timeAllocations')
+        //     ->has('timeAllocations') // s'assure que l'employé a des timeAllocations
+        //     ->get();
 
-            // Création des monthlyTotals
-            foreach ($employees as $employee) {
-                $data = $employee->timeAllocations->toArray(); // récupère les données des allocations
-                $totals = calculateMonthlyTotals($data, $months);
-                $totals['employeeId']= $employee->employeeId;
-                // Créer le monthly total
-                $employee->monthlyTotal()->create($totals);
-            }
-        }
-        monthlyTota();
+        //     // Création des monthlyTotals
+        //     foreach ($employees as $employee) {
+        //         $data = $employee->timeAllocations->toArray(); // récupère les données des allocations
+        //         $totals = calculateMonthlyTotals($data, $months);
+        //         $totals['employeeId']= $employee->employeeId;
+        //         // Créer le monthly total
+        //         $employee->monthlyTotal()->create($totals);
+        //     }
+        // }
+        // monthlyTota();
     }
 }
