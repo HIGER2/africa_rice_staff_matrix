@@ -17,7 +17,7 @@ class TimeAllocationSeeder extends Seeder
      */
     public function run(): void
     {
-        $filePath = public_path('file3.xlsx');
+        $filePath = public_path('file.xlsx');
         // $rows = Excel::toArray([], $filePath);
         // $sheet = $rows[0];       // la première feuille
         // $header = $sheet[0];  
