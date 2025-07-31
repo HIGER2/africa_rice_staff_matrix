@@ -99,7 +99,7 @@ class TimeAllocationSeeder extends Seeder
             $timeAllocation = array_slice($data,12);
 
             $parts = explode(',', $employeeData[1]);
-            $lastName = trim($parts[0]); // Nom de famille
+            $lastName = $parts[0]; // Nom de famille
             $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
             $employeeData=[
                 "matricule"=> $employeeData[0],
@@ -214,6 +214,7 @@ class TimeAllocationSeeder extends Seeder
                 $totals = calculateMonthlyTotals($data, $months);
                 $totals['employeeId']= $employee->employeeId;
                 // Créer le monthly total
+                $totals['year'] =  Carbon::now()->year;;
                 $employee->monthlyTotal()->create($totals);
             }
         }
