@@ -651,18 +651,19 @@ import { onMounted, reactive, ref, watch } from 'vue'
                         <button class="px-3 p-1  cursor-pointer  bg-gray-100 border border-gray-300  rounded hover:bg-gray-400" @click="closeModal">
                             cancel
                         </button>
+                         <button class="px-3 py-1 cursor-pointer border-0 bg-green-500 text-white rounded hover:bg-green-700" @click="saveRow">
+                            <div v-if="loading.save" class="flex items-center gap-1" >
+                                <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Processing...</div>
+                            <span v-else> Save now</span>
+                        </button>
                         <button class="px-3 py-1 cursor-pointer border-0 bg-blue-600 text-white rounded hover:bg-blue-700" @click="sendMail">
                             <div v-if="loading.send" class="flex items-center gap-1" >
                                 <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
                                 Processing...</div>
                             <span v-else> Send now</span>
                         </button>
-                        <button class="px-3 py-1 cursor-pointer border-0 bg-green-500 text-white rounded hover:bg-green-700" @click="saveRow">
-                            <div v-if="loading.save" class="flex items-center gap-1" >
-                                <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Processing...</div>
-                            <span v-else> Save now</span>
-                        </button>
+                       
                 </div>
             </div>
             </div>

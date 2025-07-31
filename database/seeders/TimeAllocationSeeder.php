@@ -127,11 +127,14 @@ class TimeAllocationSeeder extends Seeder
                     $data[$i] = (int) $data[$i];
                 }
             }
-
-            $employee = Employee::updateOrCreate(
-                ['matricule'=>$employeeData['matricule']],
+            $employee = Employee::firstOrCreate(
+                ['matricule' => $employeeData['matricule']],
                 $employeeData
-            ); 
+            );
+            // $employee = Employee::updateOrCreate(
+            //     ['matricule'=>$employeeData['matricule']],
+            //     $employeeData
+            // ); 
             // email
             // lastName
             // password
