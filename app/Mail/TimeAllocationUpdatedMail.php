@@ -31,7 +31,7 @@ class TimeAllocationUpdatedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Time Allocation Updated Mail',
+            subject: 'Time Allocation Updated',
         );
     }
 

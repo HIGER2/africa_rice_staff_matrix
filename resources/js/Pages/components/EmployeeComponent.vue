@@ -414,7 +414,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
             alert("⚠️ The total allocations must add up to exactly 1200.Please check your inputs before sending the email.")
             return false
         }
-        if (!confirm('Do you really want to deny this email?')) {
+        if (!confirm('Do you really want to send this email?')) {
             return;
         }
 
