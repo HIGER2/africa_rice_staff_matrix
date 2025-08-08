@@ -4,36 +4,36 @@
     "name": "_plugin-vue_export-helper"
   },
   "resources/css/app.css": {
-    "file": "assets/app-D5OsUY6z.css",
+    "file": "assets/app-H2d90yvQ.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/Pages/Home.vue": {
-    "file": "assets/Home-Brg-dTpj.js",
+    "file": "assets/Home-CJBFvf66.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.vue",
     "isDynamicEntry": true,
     "imports": [
-      "resources/js/Pages/components/TableOne.vue",
+      "resources/js/Pages/components/EmployeeComponent.vue",
       "resources/js/app.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ]
   },
-  "resources/js/Pages/components/TableOne.vue": {
-    "file": "assets/TableOne-C2r6swPf.js",
-    "name": "TableOne",
-    "src": "resources/js/Pages/components/TableOne.vue",
+  "resources/js/Pages/components/EmployeeComponent.vue": {
+    "file": "assets/EmployeeComponent-CFzQ-os0.js",
+    "name": "EmployeeComponent",
+    "src": "resources/js/Pages/components/EmployeeComponent.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ],
     "css": [
-      "assets/TableOne-B7YbCIis.css"
+      "assets/EmployeeComponent-DQdcZcJB.css"
     ]
   },
   "resources/js/Pages/components/TableTwo.vue": {
-    "file": "assets/TableTwo-DG1tDrbO.js",
+    "file": "assets/TableTwo-d0HyDTuH.js",
     "name": "TableTwo",
     "src": "resources/js/Pages/components/TableTwo.vue",
     "isDynamicEntry": true,
@@ -42,7 +42,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2 copy.vue": {
-    "file": "assets/TableTwo2 copy-CXFiRxhA.js",
+    "file": "assets/TableTwo2 copy-BAty4GnA.js",
     "name": "TableTwo2 copy",
     "src": "resources/js/Pages/components/TableTwo2 copy.vue",
     "isDynamicEntry": true,
@@ -55,7 +55,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2.vue": {
-    "file": "assets/TableTwo2-DoV5iw5C.js",
+    "file": "assets/TableTwo2-COkx46n6.js",
     "name": "TableTwo2",
     "src": "resources/js/Pages/components/TableTwo2.vue",
     "isDynamicEntry": true,
@@ -68,13 +68,13 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-D7e5-xxM.js",
+    "file": "assets/app-Dv92iDb_.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "resources/js/Pages/Home.vue",
-      "resources/js/Pages/components/TableOne.vue",
+      "resources/js/Pages/components/EmployeeComponent.vue",
       "resources/js/Pages/components/TableTwo.vue",
       "resources/js/Pages/components/TableTwo2 copy.vue",
       "resources/js/Pages/components/TableTwo2.vue"

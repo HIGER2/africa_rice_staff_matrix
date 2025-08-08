@@ -99,8 +99,6 @@ class AppController extends Controller
         // $employee = Employee::where('employeeId', $employeeId)->first();
         $employee = Employee::where('employeeId', $employeeId)->first();
 
-
-
         if (!$employee) {
             return response()->json(['message' => 'Employee not found'], 404);
         }
@@ -117,7 +115,7 @@ class AppController extends Controller
             );
         }
 
-        // unset($monthlyTotal['id']);
+        unset($monthlyTotal['id']);
         monthlyTotal::updateOrCreate(
             [
             // 'id' => $monthlyTotal['id'],
@@ -222,6 +220,87 @@ class AppController extends Controller
         return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
     }
 
+    public function deleteTimeAllocation(Request $request){
+        $id = $request->id;
+        $employeeId = $request->employeeId;
+
+        $employee = Employee::where('employeeId', $employeeId)->first();
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+        $timeAllocation = $employee->timeAllocations()->where('id', $id)->first();
+
+        if (!$timeAllocation) {
+            return response()->json(['message' => 'Time allocation not found'], 404);
+        }
+        // Supprimer la timeAllocation
+        $timeAllocation->delete();
+
+          $employee = Employee::select(
+                'employeeId',
+                'email',
+                'supervisorId', 
+                'matricule as resno',
+                'firstName as name',
+                'lastName as lastName',
+                'bgLevel as grade_level',
+                'grade',
+                'phone2 as division',
+                'jobTitle as position'
+            )
+            ->with([
+                'timeAllocations' => function ($query) {
+                    $query->select(
+                    'id',
+                    'employeeId',
+                    'agreement',
+                    'bus',
+                    'jan',
+                    'feb',
+                    'mar',
+                    'apr',
+                    'may',
+                    'jun',
+                    'jul',
+                    'aug',
+                    'sep',
+                    'oct',
+                    'nov',
+                    'dec',
+                    'date',
+                    'total'
+                )->orderBy('created_at', 'desc');
+                
+            },
+            'monthlyTotal' => function ($query) {
+                    $query->select(
+                        'id',
+                        'employeeId', // pour la relation timeAllocations
+                        'jan',
+                        'feb',
+                        'mar',
+                        'apr',
+                        'may',
+                        'jun',
+                        'jul',
+                        'aug',
+                        'sep',
+                        'oct',
+                        'nov',
+                        'dec',
+                        'date',
+                        'total'
+                    )
+                    ->whereYear('date', Carbon::now()->year) ;
+                }
+            ])
+            ->where('employeeId', $employeeId)
+            ->first();
+        
+        return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
+    }
+
     public function sendMail(Request $request)
     {
         $employeeId = $request->employeeId;
@@ -286,7 +365,9 @@ class AppController extends Controller
             ])
             ->where('employeeId', $employeeId)
             ->first();
-
+            if ($employee->timeAllocations->isEmpty()) {
+                return response()->json(['message' => 'Email not send allocations empty']);
+            }
         $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
             return [
                 // 'Year' => $allocation->year ?? 'N/A',
@@ -314,8 +395,8 @@ class AppController extends Controller
             if ($supervisorEmail) {
                 $mail->cc($supervisorEmail);
             }
-            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
-        return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
+            // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
+        return response()->json(['message' => 'Allocations saved successfully','data'=>$employee->timeAllocations]);
     }
 
 }

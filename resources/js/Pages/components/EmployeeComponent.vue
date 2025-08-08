@@ -11,11 +11,14 @@ import { onMounted, reactive, ref, watch } from 'vue'
     const originalStaffData = ref([])
     let loading = reactive({
         send: false,
-        save: false
+        save: false,
+        delete:false
     })
+    const selectId = ref(null)
 
     let search =ref('')
     const exClude= ['id','employeeId','agreement','bus','year','date','total']
+
     const keys = ['id','employeeId','agreement','bus','year','date',
                 'jan','feb','mar','apr','may','jun','jul','aug','sep','oct'
                 ,'nov','total'
@@ -105,7 +108,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     oct: 'OCT',
     nov: 'NOV',
     dec: 'DEC',
-    total: 'TOTAL',
+    // total: 'TOTAL',
     }
     
     const initial = {
@@ -253,7 +256,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
     }
     const morthTotal=(value,key)=>{
          let keys=['agreement','bus']
-         console.log(key);
          
         if (keys.includes(key)) {
             return ''
@@ -292,9 +294,22 @@ import { onMounted, reactive, ref, watch } from 'vue'
         return result;
     }
 
+    function totalMonths(allocation) {
+        const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+            const totalPercentages = months.reduce((total, month) => {
+                return total + allocation.reduce((sum, item) => sum + (item[month] || 0), 0);
+                }, 0);
+                
+                console.log(totalPercentages);
+            return totalPercentages
+        }
     function saveRow(index) {
+        if (selectedRow.value.timeAllocations.length === 0) {
+            alert("Please add a time allocation before submitting.");
+            return false
+        }
         if (!confirm('Are you sure you want to save these changes?')) {
-            return;
+            return false;
         }
         let items = {...selectedRow.value}  
         // let monthly_time_totals = calculateMonthlyTotals(items.timeAllocations)
@@ -306,7 +321,8 @@ import { onMounted, reactive, ref, watch } from 'vue'
             monthlyTimeTotal : items.monthlyTotal
         })
         .then(response => {
-            alert('Allocations saved successfully')
+            alert(response?.data?.message || response?.message)
+
             console.log('Allocations saved successfully', response.data.data.time_allocations)
             let indexOfStaff = staffData.value.findIndex(item => item.employeeId == items.employeeId);
 
@@ -329,7 +345,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
             selectedRow.value.monthlyTotal = {...response.data.data.monthly_total}
         })
         .catch(error => {
-            alert('Error saving allocations')
+            alert( error.response?.data?.message || error.message)
             console.error('Error saving allocations:', error.response?.data || error.message)
         })
         .finally(() => {
@@ -338,8 +354,66 @@ import { onMounted, reactive, ref, watch } from 'vue'
         })
     }
 
-    function sendMail(index) {
+    function deleteRow(id,index) {
+        if (!confirm('Are you sure you want to delete these changes?')) {
+            return;
+        }
 
+         let items = {...selectedRow.value} 
+
+        selectId.value =id
+        loading.delete = true
+        axios.post('/time-delete',
+            {
+            employeeId: items.employeeId,
+            id : id
+        }
+        )
+        .then(response => {
+            alert('Allocations delete successfully')
+            console.log('Allocations saved successfully', response.data.data.time_allocations)
+            let indexOfStaff = staffData.value.findIndex(item => item.employeeId == items.employeeId);
+            console.log(indexOfStaff);
+            
+            // staffData.value[indexOfStaff] = {
+            //         ...items,
+            //         timeAllocations: [...response.data.data.time_allocations]
+            // };
+
+            let indexOf = originalStaffData.value.findIndex(item => item.employeeId == items.employeeId);
+
+            originalStaffData.value[indexOf] = {
+                    ...items,
+                    timeAllocations: [...response.data.data.time_allocations],
+            };
+            
+            staffData.value[indexOfStaff] = {... originalStaffData.value[indexOf]}
+
+            selectedRow.value.timeAllocations = [...response.data.data.time_allocations]
+
+            console.log(staffData.value[0]);
+            
+        })
+        .catch(error => {
+            alert(error.response?.data?.message || error.message)
+            console.error('Error saving allocations:', error.response?.data || error.message)
+        })
+        .finally(() => {
+            loading.delete = false
+            
+        })
+    }
+
+    function sendMail(index) {
+        if (selectedRow.value.timeAllocations.length === 0) {
+            alert("Please add a time allocation before submitting.");
+            return false
+        }
+
+        if (totalMonths(selectedRow.value.timeAllocations) !=1200) {
+            alert("⚠️ The total allocations must add up to exactly 1200.Please check your inputs before sending the email.")
+            return false
+        }
         if (!confirm('Do you really want to deny this email?')) {
             return;
         }
@@ -350,7 +424,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
             employeeId: items.employeeId,
         })
         .then(response => {
-            alert('Allocations send successfully')
+            alert(response?.data?.message || response?.message)
         })
         .catch(error => {
             alert('Error send allocations')
@@ -522,63 +596,77 @@ import { onMounted, reactive, ref, watch } from 'vue'
         @click.self="closeModal"
         class="fixed p-10 w-full inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
             <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
-                    <div class="w-full relative">
-                        <div class="w-full flex items-center gap-2 text-[14px] py-3">
-                            <h2 class=" font-semibold mb-4 uppercase">Staff : <span class="capitalize text-gray-600"> {{ selectedRow.name  }}</span> </h2>
-                            <h2 class=" font-semibold mb-4 uppercase">Supervisor : <span class="capitalize text-gray-600"> {{  selectedRow.supervisor  }}</span> </h2>
-                            <h2 class=" font-semibold mb-4 uppercase">Year : <span class="capitalize text-gray-600">{{ new Date().getFullYear() }}</span> </h2>
-                        </div>
-                        <button 
-                            @click="closeModal"
-                            class="p-2 absolute top-0 right-2 text-2xl cursor-pointer">
-                            <i class="uil uil-times">
-                            </i>
-                        </button>
-                        <button v-if="selectedRow.timeAllocations.length>0" @click="addRow" class="p-1 px-2 mb-2  bg-green-500 text-white  cursor-pointer rounded hover:bg-green-400">
-                           + Add new
-                        </button>
-                        <div class="w-full flex items-center gap-2">
-                            <div class="borders flex gap-2 borders-gray-200  w-full">
-                            <div :class="[
-                                'flex w-full  items-start p-2 rounded-md  cursor-pointer ',
-                            ] ">
-                            <!-- <pre> {{ selectedRow.monthlyTotal }}</pre> -->
-
-                                <div v-if="selectedRow.monthlyTotal" class="w-full flex items-center  justify-center gap-1  text-[11px]"  
-                                v-for="(label, key) in content">
-                                    <span class="font-bold ">{{labelTotal(label,key)}}</span>
-                                    <transition 
-                                    name="fade-slide"
-                                            mode="out-in"
-                                    >
-                                    <span 
-                                    :class="[getColor(selectedRow.monthlyTotal[key],key),' px-1 font-medium']"
-                                    :key="selectedRow.monthlyTotal[key]">
-                                            {{morthTotal(selectedRow.monthlyTotal[key],key)}}
-                                    </span>
-                                        <!-- <span :key="morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase())">
-                                                {{ morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase()) }}
-                                        </span> -->
-                                    </transition>
-                                </div>
-                            </div>
-                        </div>
-                            <!-- <span>Statistic:</span> -->
-                            <!-- <div 
-                            v-for="(month, mIndex) in content" :key="mIndex"
-                            class="flex items-center border w-full py-3 font-medium text-[12px]">
-                                <span class="text-green-500">{{ month}} :</span>
+                <div class="w-full relative">
+                    <div class="w-full flex items-center gap-2 text-[14px] py-3">
+                        <h2 class=" font-semibold mb-4 uppercase">Staff : <span class="capitalize text-gray-600"> {{ selectedRow.name  }}</span> </h2>
+                        <h2 class=" font-semibold mb-4 uppercase">Supervisor : <span class="capitalize text-gray-600"> {{  selectedRow.supervisor  }}</span> </h2>
+                        <h2 class=" font-semibold mb-4 uppercase">Year : <span class="capitalize text-gray-600">{{ new Date().getFullYear() }}</span> </h2>
+                    </div>
+                    <button 
+                        @click="closeModal"
+                        class="p-2 absolute top-0 right-2 text-2xl cursor-pointer">
+                        <i class="uil uil-times">
+                        </i>
+                    </button>
+                    <button v-if="selectedRow.timeAllocations?.length>0" @click="addRow" class="p-1 px-2 mb-2  bg-green-500 text-white  cursor-pointer rounded hover:bg-green-400">
+                        + Add new
+                    </button>
+                    <div class="w-full flex items-center gap-2">
+                        <div class="borders flex gap-2 borders-gray-200  w-full">
+                    <div 
+                    v-if="selectedRow.timeAllocations?.length > 0"
+                    :class="[
+                            'flex w-full  items-start p-2 rounded-md  cursor-pointer ',
+                        ] ">
+                        <!-- <pre> {{ selectedRow.timeAllocations }}</pre> -->
+                            <div  class="w-full flex items-center  justify-center gap-1  text-[11px]"  
+                            v-for="(label, key) in content">
+                                <span class="font-bold ">{{labelTotal(label,key)}}</span>
                                 <transition 
                                 name="fade-slide"
                                         mode="out-in"
-                                >
-                                        <span :key="morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase())">
-                                            {{ morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase()) }}
-                                        </span>
+                            >
+                                <span 
+                                :class="[getColor(calculateTotalMorth(selectedRow.timeAllocations,key)),' px-1 font-medium']"
+                                :key="selectedRow.monthlyTotal[key]">
+                                        {{calculateTotalMorth(selectedRow.timeAllocations,key)}}
+                                </span>
+                                    <!-- <span :key="morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase())">
+                                            {{ morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase()) }}
+                                    </span> -->
                                 </transition>
-                            </div> -->
+                            </div>
+                            <div  class="w-full flex items-center  justify-center gap-1  text-[11px]" >
+                                <span class="font-bold ">Total</span>
+                                <transition 
+                                name="fade-slide"
+                                mode="out-in"
+                                >
+                                <span 
+                                :class="[getColor(totalMonths(selectedRow.timeAllocations),'total'),' px-1 font-medium']"
+                                :key="key">
+                                        {{totalMonths(selectedRow.timeAllocations)}}
+                                </span>
+                                </transition>
+                            </div>
                         </div>
                     </div>
+                        <!-- <span>Statistic:</span> -->
+                        <!-- <div 
+                        v-for="(month, mIndex) in content" :key="mIndex"
+                        class="flex items-center border w-full py-3 font-medium text-[12px]">
+                            <span class="text-green-500">{{ month}} :</span>
+                            <transition 
+                            name="fade-slide"
+                                    mode="out-in"
+                            >
+                                    <span :key="morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase())">
+                                        {{ morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase()) }}
+                                    </span>
+                            </transition>
+                        </div> -->
+                    </div>
+                </div>
                 <!-- {{ selectedRow.timeAllocations[0]['year'] }} -->
                 <div class="flex-1 overflow-y-auto" v-if="selectedRow.timeAllocations.length>0">
                     <!-- <pre>{{ selectedRow }}</pre> -->
@@ -590,11 +678,14 @@ import { onMounted, reactive, ref, watch } from 'vue'
                             <div class="w-full  rounded-full h-[1px] bg-gray-300"></div>
                         </div> -->
                         <div 
-                        class="borders flex gap-2 borders-gray-200  w-full"
+                       
+                        class="borders flex items-center gap-2 borders-gray-200 group  w-full"
                         >
-                            <div :class="[
-                                'flex w-full  items-start p-2 rounded-md  cursor-pointer  mb-2 hover:bg-blue-50',
-                                !selectedRow.timeAllocations?.[index]?.id ? 'bg-red-50' : 'bg-gray-100 '
+                            <div 
+                            :class="[
+                                'flex w-full  items-start p-2 transition-all duration-75 rounded-md  cursor-pointer  mb-2 hover:bg-blue-50',
+                                !selectedRow.timeAllocations?.[index]?.id ? 'bg-red-50' : 'bg-gray-100 ',
+                               ( loading.delete &&  selectId == selectedRow.timeAllocations?.[index]?.id ) ? 'bg-red-300':''
                             ] ">
                                 <div class="w-full text-center"   v-for="(label, key) in content">
                                     <label class="block mb-2  text-[12px] font-medium lowercase text-gray-700">{{ label }}</label>
@@ -610,7 +701,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
                                         :type="(key=='agreement' || key=='bus') ?'text' :'number'"
                                         min="0"
                                         max="100"
-                                        :disabled="key=='total'"
+                                        :disabled="key=='total' || loading.delete"
                                         :class="[
                                         {'bg-yellow-400': key=='total'},
                                         ]"
@@ -633,10 +724,22 @@ import { onMounted, reactive, ref, watch } from 'vue'
                                     </transition>
                                 </div>
                             </div>
-                            <button 
+
+                            <div>
+                        <button 
                             @click="removeItem(index)"
                             v-if="!selectedRow.timeAllocations?.[index]?.id" type="button" 
-                            class="p-1 cursor-pointer">x</button>
+                            class="p-1 cursor-pointer">x
+                            </button>
+                                <!-- <div v-if="loading.delete && selectId == selectedRow.timeAllocations?.[index]?.id" class="w-5 h-5 border-5 border-red-600 border-t-transparent rounded-full animate-spin"></div> -->
+                            <button
+                                  v-if="!loading.delete && selectedRow.timeAllocations?.[index]?.id"
+                                    :class="'cursor-pointer  group-hover:inline-block hidden'"
+                                    @click="deleteRow(selectedRow.timeAllocations?.[index]?.id,index)" 
+                                    class="p-1 cursor-pointer ">
+                                    <span class="text-red-500" ><i class="uil uil-trash-alt"></i></span>
+                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -661,7 +764,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
                             <div v-if="loading.send" class="flex items-center gap-1" >
                                 <div class="w-5 h-5 border-5 border-white border-t-transparent rounded-full animate-spin"></div>
                                 Processing...</div>
-                            <span v-else> Send now</span>
+                            <span v-else> Send email</span>
                         </button>
                        
                 </div>

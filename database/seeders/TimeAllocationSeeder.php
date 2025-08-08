@@ -127,10 +127,33 @@ class TimeAllocationSeeder extends Seeder
                     $data[$i] = (int) $data[$i];
                 }
             }
-            $employee = Employee::firstOrCreate(
-                ['matricule' => $employeeData['matricule']],
-                $employeeData
-            );
+            $employee = Employee::where('matricule', $employeeData['matricule'])->first();
+        if (!$employee) {
+            // Si n’existe pas, créer
+            $employee = Employee::create($employeeData);
+        } else {
+            // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
+            $employee->update([
+                // "matricule"=> $employeeData[0],
+                // "firstName"=>$firstName ,
+                // "lastName"=> $lastName ,
+                // "password"=>"" ,
+                // "jobTitle"=> $employeeData[2] ,
+                "bgLevel"=> $employeeData['jobTitle'] ,
+                "grade"=> $employeeData['grade'] ,
+                "organization"=> $employeeData['organization'] ,
+                "country_of_residence"=> $employeeData['country_of_residence'] ,
+                "base_station"=> $employeeData['base_station'] ,
+                "division"=> $employeeData['division'] ,
+                "phone2"=> $employeeData['division'] ,
+                "unit_organisation"=> $employeeData['unit_organisation'] ,
+                // "email"=>$employeeData[0]
+            ]);
+        }
+            // $employee = Employee::firstOrCreate(
+            //     ['matricule' => $employeeData['matricule']],
+            //     $employeeData
+            // );
             // $employee = Employee::updateOrCreate(
             //     ['matricule'=>$employeeData['matricule']],
             //     $employeeData
@@ -188,39 +211,39 @@ class TimeAllocationSeeder extends Seeder
 
         // var_dump($new);
 
-        function monthlyTota(){
-            $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        // function monthlyTota(){
+        //     $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-            function calculateMonthlyTotals(array $data, array $months): array {
-                $result = array_fill_keys($months, 0);
-                $grandTotal = 0;
+        //     function calculateMonthlyTotals(array $data, array $months): array {
+        //         $result = array_fill_keys($months, 0);
+        //         $grandTotal = 0;
 
-                foreach ($data as $item) {
-                    foreach ($months as $month) {
-                        $value = isset($item[$month]) ? (float)$item[$month] : 0;
-                        $result[$month] += $value;
-                        $grandTotal += $value;
-                    }
-                }
+        //         foreach ($data as $item) {
+        //             foreach ($months as $month) {
+        //                 $value = isset($item[$month]) ? (float)$item[$month] : 0;
+        //                 $result[$month] += $value;
+        //                 $grandTotal += $value;
+        //             }
+        //         }
 
-                $result['total'] = $grandTotal;
-                return $result;
-            }
+        //         $result['total'] = $grandTotal;
+        //         return $result;
+        //     }
 
-            $employees = Employee::with('timeAllocations')
-            ->has('timeAllocations') // s'assure que l'employé a des timeAllocations
-            ->get();
+        //     $employees = Employee::with('timeAllocations')
+        //     ->has('timeAllocations') // s'assure que l'employé a des timeAllocations
+        //     ->get();
 
-            // Création des monthlyTotals
-            foreach ($employees as $employee) {
-                $data = $employee->timeAllocations->toArray(); // récupère les données des allocations
-                $totals = calculateMonthlyTotals($data, $months);
-                $totals['employeeId']= $employee->employeeId;
-                // Créer le monthly total
-                $totals['year'] =  Carbon::now()->year;;
-                $employee->monthlyTotal()->create($totals);
-            }
-        }
-        monthlyTota();
+        //     // Création des monthlyTotals
+        //     foreach ($employees as $employee) {
+        //         $data = $employee->timeAllocations->toArray(); // récupère les données des allocations
+        //         $totals = calculateMonthlyTotals($data, $months);
+        //         $totals['employeeId']= $employee->employeeId;
+        //         // Créer le monthly total
+        //         $totals['year'] =  Carbon::now()->year;;
+        //         $employee->monthlyTotal()->create($totals);
+        //     }
+        // }
+        // monthlyTota();
     }
 }

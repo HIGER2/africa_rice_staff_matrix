@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import TableOne from './components/TableOne.vue';
-import TableTwo from './components/TableTwo.vue';
+import EmployeeComponent from './components/EmployeeComponent.vue';
 
 const props = defineProps({
   staff: Array,
@@ -9,7 +8,7 @@ const props = defineProps({
 
 
 <template>
-    <TableOne :staff="staff"/>
+    <EmployeeComponent :staff="staff"/>
      <!-- <TableTwo/> -->
       <!-- {{ staff }} -->
 </template>
