@@ -408,7 +408,7 @@ class AppController extends Controller
             if ($supervisorEmail) {
                 $mail->cc($supervisorEmail);
             }
-            // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
+            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
         return response()->json(['message' => 'Allocations saved successfully','data'=>$employee->timeAllocations]);
     }
 
