@@ -113,7 +113,7 @@ class TimeAllocationSeeder extends Seeder
                 "country_of_residence"=> $employeeData[6] ,
                 "base_station"=> $employeeData[7] ,
                 "division"=> $employeeData[8] ,
-                "unit_organisation"=> $employeeData[9] ,
+                "unit_program"=> $employeeData[9] ,
                 "email"=>$employeeData[0]
             ];
 
@@ -146,7 +146,7 @@ class TimeAllocationSeeder extends Seeder
                 "base_station"=> $employeeData['base_station'] ,
                 "division"=> $employeeData['division'] ,
                 "phone2"=> $employeeData['division'] ,
-                "unit_organisation"=> $employeeData['unit_organisation'] ,
+                "unit_program"=> $employeeData['unit_program'] ,
                 // "email"=>$employeeData[0]
             ]);
         }

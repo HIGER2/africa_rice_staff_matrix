@@ -70,14 +70,19 @@ class AppController extends Controller
             ])
             ->select(
                 'employeeId',
-                'supervisorId', // <<< AJOUTÉ : clé étrangère indispensable
+                'email',
+                'supervisorId', 
                 'matricule as resno',
                 'firstName as name',
                 'lastName as lastName',
                 'bgLevel as grade_level',
                 'grade',
                 'phone2 as division',
-                'jobTitle as position'
+                'jobTitle as position',
+                'organization',
+                'country_of_residence',
+                'base_station',
+                'unit_program'
             )
             ->where('firstName', '!=', 'admin')
             // ->take(3)
@@ -136,7 +141,11 @@ class AppController extends Controller
                 'bgLevel as grade_level',
                 'grade',
                 'phone2 as division',
-                'jobTitle as position'
+                'jobTitle as position',
+                'organization',
+                'country_of_residence',
+                'base_station',
+                'unit_program'
             )
             ->with([
                 'timeAllocations' => function ($query) {
@@ -247,7 +256,11 @@ class AppController extends Controller
                 'bgLevel as grade_level',
                 'grade',
                 'phone2 as division',
-                'jobTitle as position'
+                'jobTitle as position',
+                'organization',
+                'country_of_residence',
+                'base_station',
+                'unit_program'
             )
             ->with([
                 'timeAllocations' => function ($query) {

@@ -1,0 +1,1 @@
+import e from"./EmployeeComponent-C9Ymp9wk.js";import{d as t,c as a,o as r}from"./app-DC0gYVMm.js";import"./_plugin-vue_export-helper-DlAUqK2U.js";const c=t({__name:"Home",props:{staff:Array},setup(o){return(f,n)=>(r(),a(e,{staff:o.staff},null,8,["staff"]))}});export{c as default};

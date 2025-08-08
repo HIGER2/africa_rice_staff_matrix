@@ -466,6 +466,9 @@ import { onMounted, reactive, ref, watch } from 'vue'
 
     
     onMounted(()=>{
+
+    console.log(JSON.stringify(props.staff,null,2));
+    
     originalStaffData.value  = props.staff.map((items) => ({
     employeeId:items.employeeId,
     resno: items.resno || 'N/A',
@@ -474,7 +477,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
     grade_level: items.grade_level || 'N/A',
     grade: items.grade || 'N/A',
     organization: items.organization || 'N/A',
-    country: items.country || 'N/A',
+    country: items.country_of_residence || 'N/A',
     base_station: items.base_station || 'N/A',
     division: items.division || 'N/A',
     unit_program: items.unit_program || 'N/A',

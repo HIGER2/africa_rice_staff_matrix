@@ -22,9 +22,9 @@ return new class extends Migration
                     $table->string('division')->nullable();
                 });
             }
-            if (!Schema::hasColumn('employees', 'unit_organisation')) {
+            if (!Schema::hasColumn('employees', 'unit_program')) {
                 Schema::table('employees', function (Blueprint $table) {
-                    $table->string('unit_organisation')->nullable();
+                    $table->string('unit_program')->nullable();
                 });
             }
 
