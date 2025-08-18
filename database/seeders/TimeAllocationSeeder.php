@@ -17,7 +17,7 @@ class TimeAllocationSeeder extends Seeder
      */
     public function run(): void
     {
-        $filePath = public_path('file.xlsx');
+        $filePath = public_path('file4.xlsx');
         // $rows = Excel::toArray([], $filePath);
         // $sheet = $rows[0];       // la première feuille
         // $header = $sheet[0];  
@@ -80,7 +80,6 @@ class TimeAllocationSeeder extends Seeder
         foreach ($worksheet->getRowIterator() as $row) {
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
-
             $rowData = [];
             foreach ($cellIterator as $cell) {
                     $value = $cell->getFormattedValue();
@@ -92,114 +91,122 @@ class TimeAllocationSeeder extends Seeder
             }
             $data[] = $rowData;
         }
-
+                function normalizeNumber($value): int|float {
+                    if (is_null($value) || $value === '' || !is_numeric($value)) {
+                        return 0;
+                    }
+                    return $value; 
+                }
         
         function timeAllocation($data){
-            $employeeData = array_slice($data,1,11);
-            $timeAllocation = array_slice($data,12);
+                $employeeData = array_slice($data,1,11);
+                $timeAllocation = array_slice($data,12);
 
-            $parts = explode(',', $employeeData[1]);
-            $lastName = $parts[0]; // Nom de famille
-            $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
-            $employeeData=[
-                "matricule"=> $employeeData[0],
-                "firstName"=>$firstName ,
-                "lastName"=> $lastName ,
-                "password"=>"" ,
-                "jobTitle"=> $employeeData[2] ,
-                "bgLevel"=> $employeeData[3] ,
-                "grade"=> $employeeData[4] ,
-                "organization"=> $employeeData[5] ,
-                "country_of_residence"=> $employeeData[6] ,
-                "base_station"=> $employeeData[7] ,
-                "division"=> $employeeData[8] ,
-                "unit_program"=> $employeeData[9] ,
-                "email"=>$employeeData[0]
-            ];
+                $parts = explode(',', $employeeData[1]);
+                $lastName = $parts[0]; // Nom de famille
+                $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
+                $employeeData=[
+                    "matricule"=> $employeeData[0],
+                    "firstName"=>$firstName ,
+                    "lastName"=> $lastName ,
+                    "password"=>"" ,
+                    "jobTitle"=> $employeeData[2] ,
+                    "bgLevel"=> $employeeData[3] ,
+                    "grade"=> $employeeData[4] ,
+                    "organization"=> $employeeData[5] ,
+                    "country_of_residence"=> $employeeData[6] ,
+                    "base_station"=> $employeeData[7] ,
+                    "division"=> $employeeData[8] ,
+                    "unit_program"=> $employeeData[9] ,
+                    "email"=>$employeeData[0]
+                ];
 
-            // $resno = $data[1];
-            // if ($resno !== 'A10552') {
-            //         return;
-            //     }
-            for ($i = 14; $i <= 26; $i++) {
-                // Si la valeur est une chaîne, on la convertit en int
-                if (isset($data[$i])) {
-                    $data[$i] = (int) $data[$i];
+                // $resno = $data[1];
+                // if ($resno !== 'A10552') {
+                //         return;
+                //     }
+                for ($i = 14; $i <= 26; $i++) {
+                    // Si la valeur est une chaîne, on la convertit en int
+                    if (isset($data[$i])) {
+                        $data[$i] = (int) $data[$i];
+                    }
                 }
-            }
-            $employee = Employee::where('matricule', $employeeData['matricule'])->first();
-        if (!$employee) {
-            // Si n’existe pas, créer
-            $employee = Employee::create($employeeData);
-        } else {
-            // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
-            $employee->update([
-                // "matricule"=> $employeeData[0],
-                // "firstName"=>$firstName ,
-                // "lastName"=> $lastName ,
-                // "password"=>"" ,
-                // "jobTitle"=> $employeeData[2] ,
-                "bgLevel"=> $employeeData['jobTitle'] ,
-                "grade"=> $employeeData['grade'] ,
-                "organization"=> $employeeData['organization'] ,
-                "country_of_residence"=> $employeeData['country_of_residence'] ,
-                "base_station"=> $employeeData['base_station'] ,
-                "division"=> $employeeData['division'] ,
-                "phone2"=> $employeeData['division'] ,
-                "unit_program"=> $employeeData['unit_program'] ,
-                // "email"=>$employeeData[0]
-            ]);
-        }
-            // $employee = Employee::firstOrCreate(
-            //     ['matricule' => $employeeData['matricule']],
-            //     $employeeData
-            // );
-            // $employee = Employee::updateOrCreate(
-            //     ['matricule'=>$employeeData['matricule']],
-            //     $employeeData
-            // ); 
-            // email
-            // lastName
-            // password
-            if ($employee->wasRecentlyCreated) {
-                $new[] = $employee;
-            }
+                $employee = Employee::where('matricule', $employeeData['matricule'])->first();
 
-            if ($employee) {
-                $agreement = $data[12] ?? null;
-                $bus = $data[13] ?? null;
-                // ✅ Vérifie si ce TimeAllocation existe déjà
-                $alreadyExists = $employee->timeAllocations()
-                    ->where('agreement', $agreement)
-                    ->where('bus', $bus)
-                    ->where('year', date('Y'))
-                    ->exists();
-
-                    if (!$alreadyExists) {
-                    TimeAllocation::create([
-                        'employeeId' => $employee->employeeId,
-                        'year' => date('Y'),
-                        'agreement' => $agreement,
-                        'bus' => $bus,
-                        'jan' => $data[14] ?? 0,
-                        'feb' => $data[15] ?? 0,
-                        'mar' => $data[16] ?? 0,
-                        'apr' => $data[17] ?? 0,
-                        'may' => $data[18] ?? 0,
-                        'jun' => $data[19] ?? 0,
-                        'jul' => $data[20] ?? 0,
-                        'aug' => $data[21] ?? 0,
-                        'sep' => $data[22] ?? 0,
-                        'oct' => $data[23] ?? 0,
-                        'nov' => $data[24] ?? 0,
-                        'dec' => $data[25] ?? 0,
-                        'total' => $data[26] ?? 0,
+                if (!$employee) {
+                    // Si n’existe pas, créer
+                    $employee = Employee::create($employeeData);
+                } else {
+                    // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
+                    $employee->update([
+                        // "matricule"=> $employeeData[0],
+                        // "firstName"=>$firstName ,
+                        // "lastName"=> $lastName ,
+                        // "password"=>"" ,
+                        // "jobTitle"=> $employeeData[2] ,
+                        "bgLevel"=> $employeeData['jobTitle'] ,
+                        "grade"=> $employeeData['grade'] ,
+                        "organization"=> $employeeData['organization'] ,
+                        "country_of_residence"=> $employeeData['country_of_residence'] ,
+                        "base_station"=> $employeeData['base_station'] ,
+                        "division"=> $employeeData['division'] ,
+                        "phone2"=> $employeeData['division'] ,
+                        "unit_program"=> $employeeData['unit_program'] ,
+                        // "email"=>$employeeData[0]
                     ]);
                 }
-            }
 
+                // $employee = Employee::firstOrCreate(
+                //     ['matricule' => $employeeData['matricule']],
+                //     $employeeData
+                // );
+                // $employee = Employee::updateOrCreate(
+                //     ['matricule'=>$employeeData['matricule']],
+                //     $employeeData
+                // ); 
+                // email
+                // lastName
+                // password
+                if ($employee->wasRecentlyCreated) {
+                    $new[] = $employee;
+                }
 
+                if ($employee) {
+                    $agreement = $data[12] ?? null;
+                    $bus = $data[13] ?? null;
+                    // ✅ Vérifie si ce TimeAllocation existe déjà
+                    $alreadyExists = $employee->timeAllocations()
+                        ->where('agreement', $agreement)
+                        ->where('bus', $bus)
+                        ->where('year', date('Y'))
+                        ->exists();
 
+                      
+                        
+                        if (!$alreadyExists) {
+
+                        $payload = [
+                            'employeeId' => $employee->employeeId,
+                            'year' => date('Y'),
+                            'agreement' => $agreement,
+                            'bus' => $bus,
+                            'jan' => normalizeNumber($data[14]),
+                            'feb' => normalizeNumber($data[15]),
+                            'mar' => normalizeNumber($data[16]),
+                            'apr' =>normalizeNumber($data[17]),
+                            'may' =>normalizeNumber($data[18]),
+                            'jun' =>normalizeNumber($data[19]),
+                            'jul' =>normalizeNumber($data[20]),
+                            'aug' => normalizeNumber($data[21]),
+                            'sep' => normalizeNumber($data[22]),
+                            'oct' => normalizeNumber($data[23]),
+                            'nov' => normalizeNumber($data[24]),
+                            'dec' => normalizeNumber($data[25]),
+                            'total' =>normalizeNumber($data[26]),
+                        ];
+                        TimeAllocation::create($payload);
+                    }
+                }
         }
 
         foreach ($data as $key=> $row) {
@@ -209,7 +216,8 @@ class TimeAllocationSeeder extends Seeder
         // break;
         }
 
-        // var_dump($new);
+        // var_dump($data[11]);
+        // timeAllocation($data[11]);
 
         // function monthlyTota(){
         //     $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
