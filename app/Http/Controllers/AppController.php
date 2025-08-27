@@ -96,6 +96,7 @@ class AppController extends Controller
     public function importAllocation()
     {
             $employees = DB::table('employees')
+            ->where('employees.firstName', '!=', 'admin')
             ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.supervisorId')
             ->leftJoin('time_allocations', 'employees.employeeId', '=', 'time_allocations.employeeId')
             ->select(
