@@ -4,10 +4,13 @@
  <script setup>
     import { Inertia } from '@inertiajs/inertia'
 import { onMounted, reactive, ref, watch } from 'vue'
+import * as XLSX from 'xlsx'
+
     const props = defineProps({
     staff: Array,
     })
     let staffData = ref([])
+    const loadingImport = ref(false)
     const originalStaffData = ref([])
     let loading = reactive({
         send: false,
@@ -463,7 +466,24 @@ import { onMounted, reactive, ref, watch } from 'vue'
         item.resno.toLowerCase().includes(lowerVal)
     )
     })
-
+    const handleImport =async () => {
+        loadingImport.value = true
+            axios.get('/time-import')
+            .then(response => {
+                console.log(response.data.data[10]) // Ici tu récupères tes données
+                const ws = XLSX.utils.json_to_sheet(response.data.data)
+                                // Créer un classeur et y ajouter la feuille
+                    const wb = XLSX.utils.book_new()
+                    XLSX.utils.book_append_sheet(wb, ws, "Employees") 
+                    // Exporter en fichier Excel
+                    XLSX.writeFile(wb, "employees.xlsx")
+            })
+            .catch(error => {
+                console.error(error)
+            }).finally(()=>{
+                loadingImport.value = false
+            })
+    }
     
     onMounted(()=>{
 
@@ -514,15 +534,27 @@ import { onMounted, reactive, ref, watch } from 'vue'
 
 <template>
     <div class="p-7 w-full h-screen  flex flex-col" >
-        <h1 class="text-xl font-bold mb-4">Staff Time Allocation</h1>
+        <div class="flex py-3 mb-3 justify-between items-center  top-0 sticky bg-white z-10 ">
+            <h1 class="text-xl font-bold mb-4">Staff Time Allocation</h1>
+            <div class="flex items-center gap-2 ">
+                    <input 
+                    v-model="search"
+                    class="border border-gray-300 p-2 rounded-lg "
+                    type="search" placeholder="search..." name="" id="">
+                    <button 
+                    :disabled="loadingImport"
+                    @click="handleImport"
+                    type="button" 
+                    class="p-2 cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+                    <i class="uil uil-import"></i> 
+                    <span v-if="!loadingImport">import</span>
+                    <span v-else>Loading...</span>
+                    </button>
+                </div>
+
+        </div>
         <!-- <pre>{{ staff}}</pre> -->
         <div class="flex-1 ">
-            <div class="w-full">
-                <input 
-                v-model="search"
-                class="border border-gray-300 p-2 rounded-lg w-full mb-3"
-                type="search" placeholder="search..." name="" id="">
-            </div>
             <div class="overflow-x-auto border border-gray-200 rounded-lg overflow-y-auto min-h-10 max-h-[600px]">
                 <table class="min-w-max  text-sm w-full border-collapse">
                     <thead class="bg-gray-200  sticky top-0 ">
@@ -597,7 +629,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
         <!-- Modal -->
         <div v-if="selectedRow" 
         @click.self="closeModal"
-        class="fixed p-10 w-full inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
+        class="fixed p-10 w-full z-20 inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
             <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
                 <div class="w-full relative">
                     <div class="w-full flex items-center gap-2 text-[14px] py-3">

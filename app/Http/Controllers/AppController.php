@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class AppController extends Controller
@@ -90,6 +91,47 @@ class AppController extends Controller
         return Inertia::render('Home', [
             'staff' =>$employees
         ]);
+    }
+
+    public function importAllocation()
+    {
+            $employees = DB::table('employees')
+            ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.supervisorId')
+            ->leftJoin('time_allocations', 'employees.employeeId', '=', 'time_allocations.employeeId')
+            ->select(
+                // 'employees.employeeId',
+                // 'employees.email',
+                'employees.matricule as resno',
+                DB::raw("CONCAT(employees.firstName, ' ', employees.lastName) as name"),
+                'employees.bgLevel as grade level',
+                'employees.grade',
+                'employees.phone2 as division',
+                'employees.jobTitle as position',
+                'employees.organization',
+                'employees.country_of_residence as country of residence',
+                'employees.base_station as base station',
+                'employees.unit_program as unit program',
+                DB::raw("CONCAT(supervisors.firstName, ' ', supervisors.lastName) as supervisor_name"),
+                'time_allocations.agreement',
+                'time_allocations.bus',
+                'time_allocations.jan',
+                'time_allocations.feb',
+                'time_allocations.mar',
+                'time_allocations.apr',
+                'time_allocations.may',
+                'time_allocations.jun',
+                'time_allocations.jul',
+                'time_allocations.aug',
+                'time_allocations.sep',
+                'time_allocations.oct',
+                'time_allocations.nov',
+                'time_allocations.dec',
+                'time_allocations.total'
+            )
+            ->get();
+
+
+        return response()->json(['data' => $employees]);
     }
 
     public function addAllocation(Request $request)
