@@ -5,6 +5,8 @@
     import { Inertia } from '@inertiajs/inertia'
 import { onMounted, reactive, ref, watch } from 'vue'
 import * as XLSX from 'xlsx'
+import AllocationConmponent from './AllocationConmponent.vue'
+import EditEmployeeComponent from './EditEmployeeComponent.vue'
 
     const props = defineProps({
     staff: Array,
@@ -12,231 +14,68 @@ import * as XLSX from 'xlsx'
     let staffData = ref([])
     const loadingImport = ref(false)
     const originalStaffData = ref([])
+    const isModalVisible = ref(false)
+    const selectedEmployee = ref({})
     let loading = reactive({
         send: false,
         save: false,
         delete:false
     })
-    const selectId = ref(null)
 
     let search =ref('')
-    const exClude= ['id','employeeId','agreement','bus','year','date','total']
-
-    const keys = ['id','employeeId','agreement','bus','year','date',
-                'jan','feb','mar','apr','may','jun','jul','aug','sep','oct'
-                ,'nov','total'
-                ]
 
     Array.prototype.isAnyExcluded = function (keys) {
         return keys.some(key => this.includes(key));
     };
 
-    function isAnyExcluded(keys) {
-        return keys.some(key => exClude.includes(key));
-    }
     // Clé-valeur : clé technique + nom affiché
-    const headers = {
-    resno: 'RESNO',
-    name: 'NAME',
-    position: 'POSITION',
-    grade_level: 'GRADE/LEVEL',
-    grade: 'GRADE',
-    organization: 'ORGANIZATION',
-    country: 'COUNTRY',
-    base_station: 'BASE STATION',
-    division: 'DIVISION',
-    unit_program: 'UNIT/PROGRAM',
-    supervisor: 'SUPERVISOR',
-    }
-    const headerMorth={
-        agreement: 'AGREEMENT',
-        bus: 'BUS',
-        jan: 'JAN',
-        feb: 'FB',
-        apr: 'APR',
-        mar: 'MAR',
-        may: 'MAY',
-        jun: 'JUN',
-        jul: 'JUL',
-        aug: 'AUG',
-        sep: 'SEP',
-        oct: 'OCT',
-        nov: 'NOV',
-        dec: 'DEC',
-        total: 'Total',
-    }
-
-    const headerTotal={
-        jan: 'JAN',
-        feb: 'FB',
-        apr: 'APR',
-        mar: 'MAR',
-        may: 'MAY',
-        jun: 'JUN',
-        jul: 'JUL',
-        aug: 'AUG',
-        sep: 'SEP',
-        oct: 'OCT',
-        nov: 'NOV',
-        dec: 'DEC',
-        total: 'Total',
-    }
-
-    const morth={
-        jan: 'JAN',
-        feb: 'FEB',
-        apr: 'APR',
-        mar: 'MAR',
-        may: 'MAY',
-        jun: 'JUN',
-        jul: 'JUL',
-        aug: 'AUG',
-        sep: 'SEP',
-        oct: 'OCT',
-        nov: 'NOV',
-        dec: 'DEC',
-    }
-    const content = {
-    agreement: 'AGREEMENT',
-    bus: 'BUS',
-    jan: 'JAN',
-    feb: 'FEB',
-    apr: 'APR',
-    mar: 'MAR',
-    may: 'MAY',
-    jun: 'JUN',
-    jul: 'JUL',
-    aug: 'AUG',
-    sep: 'SEP',
-    oct: 'OCT',
-    nov: 'NOV',
-    dec: 'DEC',
-    // total: 'TOTAL',
-    }
-    
-    const initial = {
-            id:null,
-            agreement: 0,
-            bus: 0,
-            jan: 0,
-            feb: 0,
-            mar: 0,
-            apr: 0,
-            may: 0,
-            jun: 0,
-            jul: 0,
-            aug: 0,
-            sep: 0,
-            oct: 0,
-            nov: 0,
-            dec: 0,
-            total: 0,
-        }
-
-    const initialTotal = {
-        id:null,
-        jan: 0,
-        feb: 0,
-        mar: 0,
-        apr: 0,
-        may: 0,
-        jun: 0,
-        jul: 0,
-        aug: 0,
-        sep: 0,
-        oct: 0,
-        nov: 0,
-        dec: 0,
-        total: 0,
-    }
-    //     [
-    //     // {
-    //     // agreement: '876587687',
-    //     // bus: '8876876',
-    //     // jan: '1',
-    //     // feb: '2',
-    //     // apr: '2',
-    //     // mar: '3',
-    //     // may: '4',
-    //     // jun: '5',
-    //     // jul: '6',
-    //     // aug: '7',
-    //     // sep: '3',
-    //     // oct: '3',
-    //     // nov: '3',
-    //     // dec: '3',
-    //     // total: '100',
-    //     // year:'2025'
-    //     // },
-    //     // {
-    //     // agreement: '876587687',
-    //     // bus: '8876876',
-    //     // jan: '1',
-    //     // feb: '2',
-    //     // apr: '2',
-    //     // mar: '3',
-    //     // may: '4',
-    //     // jun: '5',
-    //     // jul: '6',
-    //     // aug: '7',
-    //     // sep: '3',
-    //     // oct: '3',
-    //     // nov: '3',
-    //     // dec: '3',
-    //     // total: '100',
-    //     // },
-    //     // {
-    //     // agreement: '876587687',
-    //     // bus: '8876876',
-    //     // jan: '1',
-    //     // feb: '2',
-    //     // apr: '2',
-    //     // mar: '3',
-    //     // may: '4',
-    //     // jun: '5',
-    //     // jul: '6',
-    //     // aug: '7',
-    //     // sep: '3',
-    //     // oct: '3',
-    //     // nov: '3',
-    //     // dec: '3',
-    //     // total: '100',
-    //     // }
-    // ]
+    // const headers = {
+    // resno: 'RESNO',
+    // name: 'NAME',
+    // position: 'POSITION',
+    // grade_level: 'GRADE/LEVEL',
+    // grade: 'GRADE',
+    // organization: 'ORGANIZATION',
+    // country: 'COUNTRY',
+    // base_station: 'BASE STATION',
+    // division: 'DIVISION',
+    // unit_program: 'UNIT/PROGRAM',
+    // supervisor: 'SUPERVISOR',
+    // }
+    const headers = [
+    // { label: "Employee ID", key: "employeeId" },
+    // { label: "Supervisor ID", key: "supervisorId" },
+    { label: "RES Number", key: "resno" },
+    { label: "First Name", key: "name" },
+    { label: "Last Name", key: "lastName" },
+    // { label: "Supervisor Matricule", key: "supervisors_matricule" },
+    { label: "Supervisor Name", key: "supervisor_name" },
+    { label: "Grade Level", key: "grade_level" },
+    { label: "Grade", key: "grade" },
+    { label: "Division", key: "division" },
+    { label: "Position", key: "position" },
+    { label: "Organization", key: "organization" },
+    { label: "Country of Residence", key: "country_of_residence" },
+    { label: "Base Station", key: "base_station" },
+    { label: "Unit/Program", key: "unit_program" }
+    ];
 
     let selectedRow = ref(null)
-    
-    const getRowTotal = (val,index) => {
+    // methode
+    const openEmployeeModal = (employee) => {
+    console.log('Ouverture de la modal pour:', employee)
+    selectedEmployee.value = { ...employee } // Copie pour éviter les mutations
+    isModalVisible.value = true
+    }
 
-    const total =  Object
-        .keys(selectedRow.value.timeAllocations[index])
-        .filter((key)=>{
-            if (!exClude.includes(key)) {
-                return key
-            }
-        })
-        .reduce((acc, value) => {
-            if (selectedRow.value.timeAllocations[index][value]) {
-                acc +=selectedRow.value.timeAllocations[index][value]
-            }
-            return acc;
-        }, 0);
-        
-        selectedRow.value.timeAllocations[index].total = total
-
-        selectedRow.value.monthlyTotal = {
-            ...selectedRow.value.monthlyTotal,
-            ...calculateMonthlyTotals(selectedRow.value.timeAllocations)
-        }
-
-        console.log(selectedRow.value.timeAllocations[index]);
-        
-    };
+    const closeModalEdit = () => {
+        isModalVisible.value = false
+        selectedEmployee.value = {}
+    }
 
     function openModal(row) {
         selectedRow.value = {
-            ...row,
-            timeAllocations:[...row.timeAllocations]
+            ...row
             }
     }
     
@@ -245,227 +84,23 @@ import * as XLSX from 'xlsx'
         
     }
 
-    function calculateTotalMorth (data,key) {
-        if (exClude.includes(key)) {
-            return ''
-        }
-        return data.reduce((acc,val)=>{
-            if (val[key]) {
-                acc += Number(val[key])
-            }
-            return acc
-            // return Object.keys(item)[index]==key 
-        },0)
-    }
-    const morthTotal=(value,key)=>{
-         let keys=['agreement','bus']
-         
-        if (keys.includes(key)) {
-            return ''
-        }
-        return `${value}%`
-    }
 
-    const labelTotal=(label,key)=>{
-        let keys=['agreement','bus']
-        if (keys.includes(key)) {
-            return ''
-        }
-
-        return `${label}:`
-    }
-
-    function addRow() {
-        // selectedRow.value.timeAllocations.push({...initial})
-            selectedRow.value.timeAllocations.unshift({...initial});
-            if (selectedRow.value.timeAllocations.length ==1) {
-                selectedRow.value.monthlyTotal ={...initialTotal}
-            }
-    }
-    
-    function calculateMonthlyTotals(data) {
-    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-        const result = {};
-        let grandTotal = 0;
-
-        for (const month of months) {
-            const monthTotal = data.reduce((sum, item) => sum + (Number(item[month]) || 0), 0);
-            result[`${month}`] = monthTotal;
-            grandTotal += monthTotal;
-        }
-        result.total = grandTotal;
-        return result;
-    }
-
-    function totalMonths(allocation) {
-        const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
-            const totalPercentages = months.reduce((total, month) => {
-                return total + allocation.reduce((sum, item) => sum + (item[month] || 0), 0);
-                }, 0);
-                
-                console.log(totalPercentages);
-            return totalPercentages
-        }
-    function saveRow(index) {
-        if (selectedRow.value.timeAllocations.length === 0) {
-            alert("Please add a time allocation before submitting.");
-            return false
-        }
-        if (!confirm('Are you sure you want to save these changes?')) {
-            return false;
-        }
-        let items = {...selectedRow.value}  
-        // let monthly_time_totals = calculateMonthlyTotals(items.timeAllocations)
-        
-            loading.save =true
-        axios.post('/time-allocations', {
-            employeeId: items.employeeId,
-            timeAllocations: items.timeAllocations,
-            monthlyTimeTotal : items.monthlyTotal
-        })
-        .then(response => {
-            alert(response?.data?.message || response?.message)
-
-            console.log('Allocations saved successfully', response.data.data.time_allocations)
-            let indexOfStaff = staffData.value.findIndex(item => item.employeeId == items.employeeId);
-
-            // staffData.value[indexOfStaff] = {
-            //         ...items,
-            //         timeAllocations: [...response.data.data.time_allocations]
-            // };
-
-            let indexOf = originalStaffData.value.findIndex(item => item.employeeId == items.employeeId);
-
-            originalStaffData.value[indexOf] = {
-                    ...items,
-                    timeAllocations: [...response.data.data.time_allocations],
-                    monthlyTotal: {...response.data.data.monthly_total}
-            };
-            
-            staffData.value[indexOfStaff] = {... originalStaffData.value[indexOf]}
-            
-            selectedRow.value.timeAllocations = [...response.data.data.time_allocations]
-            selectedRow.value.monthlyTotal = {...response.data.data.monthly_total}
-        })
-        .catch(error => {
-            alert( error.response?.data?.message || error.message)
-            console.error('Error saving allocations:', error.response?.data || error.message)
-        })
-        .finally(() => {
-            loading.save = false
-            // closeModal()
-        })
-    }
-
-    function deleteRow(id,index) {
-        if (!confirm('Are you sure you want to delete these changes?')) {
-            return;
-        }
-
-         let items = {...selectedRow.value} 
-
-        selectId.value =id
-        loading.delete = true
-        axios.post('/time-delete',
-            {
-            employeeId: items.employeeId,
-            id : id
-        }
-        )
-        .then(response => {
-            alert('Allocations delete successfully')
-            console.log('Allocations saved successfully', response.data.data.time_allocations)
-            let indexOfStaff = staffData.value.findIndex(item => item.employeeId == items.employeeId);
-            console.log(indexOfStaff);
-            
-            // staffData.value[indexOfStaff] = {
-            //         ...items,
-            //         timeAllocations: [...response.data.data.time_allocations]
-            // };
-
-            let indexOf = originalStaffData.value.findIndex(item => item.employeeId == items.employeeId);
-
-            originalStaffData.value[indexOf] = {
-                    ...items,
-                    timeAllocations: [...response.data.data.time_allocations],
-            };
-            
-            staffData.value[indexOfStaff] = {... originalStaffData.value[indexOf]}
-
-            selectedRow.value.timeAllocations = [...response.data.data.time_allocations]
-
-            console.log(staffData.value[0]);
-            
-        })
-        .catch(error => {
-            alert(error.response?.data?.message || error.message)
-            console.error('Error saving allocations:', error.response?.data || error.message)
-        })
-        .finally(() => {
-            loading.delete = false
-            
-        })
-    }
-
-    function sendMail(index) {
-        if (selectedRow.value.timeAllocations.length === 0) {
-            alert("Please add a time allocation before submitting.");
-            return false
-        }
-
-        if (totalMonths(selectedRow.value.timeAllocations) !=1200) {
-            alert("⚠️ The total allocations must add up to exactly 1200.Please check your inputs before sending the email.")
-            return false
-        }
-        if (!confirm('Do you really want to send this email?')) {
-            return;
-        }
-
-        loading.send =true
-        let items = {...selectedRow.value}  
-        axios.post('/send-mail', {
-            employeeId: items.employeeId,
-        })
-        .then(response => {
-            alert(response?.data?.message || response?.message)
-        })
-        .catch(error => {
-            alert('Error send allocations')
-        })
-        .finally(() => {
-            loading.send = false
-            // closeModal()
-        })
-    }
-
-    function removeItem(index){
-        selectedRow.value.timeAllocations.splice(index,1);
-        selectedRow.value.monthlyTotal =  calculateMonthlyTotals(selectedRow.value.timeAllocations)
-        if (selectedRow.value.timeAllocations.length ==0) {
-            selectedRow.value.monthlyTotal =null
-        }
-    }
-
-    function progress(key, value) {
-        return exClude.includes(key) ? 0 : value ? `${value > 100 ? 100 : value}%` : 0;
-        // const total = selectedRow.value.timeAllocations[index].total || 0;
-        // return total > 0 ? (selectedRow.value.timeAllocations[index][key] / total) * 100 : 0;   
-        
-    }
-    function getColor(value ,key){
-        let per = key=='total' ? 1200 : 100
-
-        return  value < per ? 'bg-blue-500' :
-            value > per ?  'bg-red-500' :
-            'bg-green-300'
-    }
     watch(search, (value) => {
-    const lowerVal = value.toLowerCase()
-    staffData.value = originalStaffData.value.filter(item =>
-        item.name.toLowerCase().includes(lowerVal) ||
-        item.resno.toLowerCase().includes(lowerVal)
-    )
+        const lowerVal = value.toLowerCase()
+        staffData.value = props.staff.filter(item =>
+            item?.name.toLowerCase().includes(lowerVal) ||
+            item?.lastName.toLowerCase().includes(lowerVal) 
+            // item?.resno.toLowerCase().includes(lowerVal)
+        )
     })
+    
+    watch(
+    () => props.staff,
+    (newData) => {
+        staffData.value = newData
+    },
+    { deep: true, immediate: true }
+    )
     const handleImport =async () => {
         loadingImport.value = true
             axios.get('/time-import')
@@ -484,47 +119,14 @@ import * as XLSX from 'xlsx'
                 loadingImport.value = false
             })
     }
+
+    function onScroll(event){
+        // console.log(event.scroll);
+        
+    }
+
     
     onMounted(()=>{
-
-    console.log(JSON.stringify(props.staff,null,2));
-    
-    originalStaffData.value  = props.staff.map((items) => ({
-    employeeId:items.employeeId,
-    resno: items.resno || 'N/A',
-    name: items?.lastName?.toLowerCase() +' '+items?.name.toLowerCase(),
-    position: items.position || 'N/A',
-    grade_level: items.grade_level || 'N/A',
-    grade: items.grade || 'N/A',
-    organization: items.organization || 'N/A',
-    country: items.country_of_residence || 'N/A',
-    base_station: items.base_station || 'N/A',
-    division: items.division || 'N/A',
-    unit_program: items.unit_program || 'N/A',
-    supervisor: items.supervisor
-    ? `${items.supervisor.firstName.toLowerCase() || ''} ${items.supervisor.lastName.toLowerCase() || ''}`.trim() || 'N/A'
-    : 'N/A',
-    timeAllocations: items.time_allocations,
-    monthlyTotal: items.monthly_total,
-
-  }))
-    staffData.value = [...originalStaffData.value]
-    
-    //     console.log(
-    // props.staff.map((items) => ({
-    //     resno: items.resno || 'N/A',
-    //     name: items.name || 'N/A',
-    //     position: items.position || 'N/A',
-    //     grade_level: items.grade_level || 'N/A',
-    //     grade: items.grade || 'N/A',
-    //     organization: items.organization || 'N/A',
-    //     country: items.country || 'N/A',
-    //     base_station: items.base_station || 'N/A',
-    //     division: items.division || 'N/A',
-    //     unit_program: items.unit_program || 'N/A',
-    //     supervisor: items.supervisor || 'N/A',
-    // }))
-    // );
 
     })
 
@@ -533,8 +135,9 @@ import * as XLSX from 'xlsx'
 
 
 <template>
-    <div class="p-7 w-full h-screen  flex flex-col" >
-        <div class="flex py-3 mb-3 justify-between items-center  top-0 sticky bg-white z-10 ">
+    <div class="w-full h-screen  flex flex-col" >
+    <div class="w-full p-3">
+        <div class="flex p-4 rounded-lg mb-3 justify-between items-center z-30  top-0 sticky bg-white ">
             <h1 class="text-xl font-bold mb-4">Staff Time Allocation</h1>
             <div class="flex items-center gap-2 ">
                     <input 
@@ -553,18 +156,27 @@ import * as XLSX from 'xlsx'
                 </div>
 
         </div>
-        <!-- <pre>{{ staff}}</pre> -->
-        <div class="flex-1 ">
-            <div class="overflow-x-auto border border-gray-200 rounded-lg overflow-y-auto min-h-10 max-h-[600px]">
-                <table class="min-w-max  text-sm w-full border-collapse">
-                    <thead class="bg-gray-200  sticky top-0 ">
+    </div>
+        <div class="flex-1 p-3 ">
+                    
+            <div 
+            @scroll="onScroll"
+            class="w-full rounded-lg overflow-hidden bg-white border border-gray-200">
+               <div class=" overflow-x-auto overflow-y-auto min-h-10 max-h-[600px]">
+                   <table class="min-w-max   text-sm w-full border-collapse">
+                    <thead class=" bg-white z-20  sticky top-0 ">
                     <tr>
                         <th
-                        v-for="(label, key) in headers"
-                        :key="key"
-                        class="px-4 py-2 border text-[11px] border-gray-300 text-left whitespace-nowrap"
+                        v-for="(item, key) in headers"
+                        :key="item.key"
+                        :class="item.key=='resno' && 'sticky left-0 border'
+                        "
+                        class="px-4 py-4 bg-white border text-[11px] border-gray-300 text-left whitespace-nowrap"
                         >
-                        {{ label }}
+                        {{ item.label}}
+                        </th>
+                        <th class="sticky bg-white right-0 z-10">
+                            Action
                         </th>
                         <!-- <th
                         v-for="(label, key) in headerMorth"
@@ -610,27 +222,60 @@ import * as XLSX from 'xlsx'
                             v-for="(row, index) in staffData"
                             :key="index"
                             class="hover:bg-blue-100 cursor-pointer"
-                            @click="openModal(row)"
+                            
                         >
                             <td
-                            v-for="(label, key) in headers"
-                            :key="key"
-                            class="px-4 py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                            v-for="(item, key) in headers"
+                            :key="item.key"
+                            :class="item.key=='resno' && 'sticky left-0 z-10'
+                            "
+                            class="px-4 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
                             >
-                            {{row[key] }}
-                            
+                            {{row[item.key]}}
+                            </td>
+                            <td
+                            class="px-4 sticky right-0 z-10 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                            >
+                                <div class="flex items-center gap-2 px-2  ">
+                                    <button 
+                                    type="button"
+                                    @click="openModal(row)"
+                                    class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
+                                    <i class="uil uil-eye"></i>Allocation</button>
+                                    <button 
+                                    @click="openEmployeeModal(row)"
+                                    type="button"
+                                    class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
+                                    <i class="uil uil-pen"></i>Edit
+                                </button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+               </div>
             </div>
         </div>
 
         <!-- Modal -->
-        <div v-if="selectedRow" 
+            <AllocationConmponent 
+            @update:selectedRow="handleUpdateSelectedRow"
+            @close="closeModal"
+            @save="handleSaveTimeAllocations"
+            @sendEmail="handleSendEmail"
+            :selectedRow="selectedRow"
+            :staffId="selectedRow?.employeeId"
+            />
+            <EditEmployeeComponent
+            :is-visible="isModalVisible"
+            :employee-data="selectedEmployee"
+            @close="closeModalEdit"
+            @submit="handleEmployeeUpdate"
+            />
+        <!-- <div v-if="selectedRow" 
         @click.self="closeModal"
         class="fixed p-10 w-full z-20 inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
+            <div class="bg-slatext-slate-950 font-medium flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
                 <div class="w-full relative">
                     <div class="w-full flex items-center gap-2 text-[14px] py-3">
                         <h2 class=" font-semibold mb-4 uppercase">Staff : <span class="capitalize text-gray-600"> {{ selectedRow.name  }}</span> </h2>
@@ -653,7 +298,6 @@ import * as XLSX from 'xlsx'
                     :class="[
                             'flex w-full  items-start p-2 rounded-md  cursor-pointer ',
                         ] ">
-                        <!-- <pre> {{ selectedRow.timeAllocations }}</pre> -->
                             <div  class="w-full flex items-center  justify-center gap-1  text-[11px]"  
                             v-for="(label, key) in content">
                                 <span class="font-bold ">{{labelTotal(label,key)}}</span>
@@ -666,9 +310,7 @@ import * as XLSX from 'xlsx'
                                 :key="selectedRow.monthlyTotal[key]">
                                         {{calculateTotalMorth(selectedRow.timeAllocations,key)}}
                                 </span>
-                                    <!-- <span :key="morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase())">
-                                            {{ morthTotal(selectedRow.timeAllocations, label.toLocaleLowerCase()) }}
-                                    </span> -->
+                               
                                 </transition>
                             </div>
                             <div  class="w-full flex items-center  justify-center gap-1  text-[11px]" >
@@ -686,32 +328,11 @@ import * as XLSX from 'xlsx'
                             </div>
                         </div>
                     </div>
-                        <!-- <span>Statistic:</span> -->
-                        <!-- <div 
-                        v-for="(month, mIndex) in content" :key="mIndex"
-                        class="flex items-center border w-full py-3 font-medium text-[12px]">
-                            <span class="text-green-500">{{ month}} :</span>
-                            <transition 
-                            name="fade-slide"
-                                    mode="out-in"
-                            >
-                                    <span :key="morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase())">
-                                        {{ morthTotal(selectedRow.timeAllocations, month.toLocaleLowerCase()) }}
-                                    </span>
-                            </transition>
-                        </div> -->
                     </div>
                 </div>
-                <!-- {{ selectedRow.timeAllocations[0]['year'] }} -->
                 <div class="flex-1 overflow-y-auto" v-if="selectedRow.timeAllocations.length>0">
-                    <!-- <pre>{{ selectedRow }}</pre> -->
                     <div class="w-full " v-for="(items, index) in selectedRow.timeAllocations" :key="index">
-                        <!-- {{ selectedRow.timeAllocations[index]['year'] }} -->
-                        <!-- <div v-if="selectedRow.timeAllocations[index]['date']" class="w-full flex items-center gap-1">
-                            <div class="w-full rounded-full  h-[1px] bg-gray-300"></div>
-                            <div class="min-w-max">{{ selectedRow.timeAllocations[index]['date'] }}</div>
-                            <div class="w-full  rounded-full h-[1px] bg-gray-300"></div>
-                        </div> -->
+                      
                         <div 
                        
                         class="borders flex items-center gap-2 borders-gray-200 group  w-full"
@@ -725,13 +346,11 @@ import * as XLSX from 'xlsx'
                                 <div class="w-full text-center"   v-for="(label, key) in content">
                                     <label class="block mb-2  text-[12px] font-medium lowercase text-gray-700">{{ label }}</label>
                                     <div class="relative w-full h-8">
-                                        <!-- fond de progression -->
                                         <div
                                         class="absolute inset-0 bg-green-300 transition-all duration-200 rounded"
                                         :style="{ width: progress(key,selectedRow.timeAllocations[index][key]), zIndex: 0 }"
                                         ></div>
 
-                                        <!-- input au-dessus -->
                                         <input
                                         :type="(key=='agreement' || key=='bus') ?'text' :'number'"
                                         min="0"
@@ -766,7 +385,6 @@ import * as XLSX from 'xlsx'
                             v-if="!selectedRow.timeAllocations?.[index]?.id" type="button" 
                             class="p-1 cursor-pointer">x
                             </button>
-                                <!-- <div v-if="loading.delete && selectId == selectedRow.timeAllocations?.[index]?.id" class="w-5 h-5 border-5 border-red-600 border-t-transparent rounded-full animate-spin"></div> -->
                             <button
                                   v-if="!loading.delete && selectedRow.timeAllocations?.[index]?.id"
                                     :class="'cursor-pointer  group-hover:inline-block hidden'"
@@ -801,11 +419,10 @@ import * as XLSX from 'xlsx'
                                 Processing...</div>
                             <span v-else> Send email</span>
                         </button>
-                       
                 </div>
             </div>
             </div>
-        </div>
+        </div> -->
     </div>
     </template>
 

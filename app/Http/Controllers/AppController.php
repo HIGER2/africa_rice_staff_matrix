@@ -14,90 +14,84 @@ use Illuminate\Support\Facades\Mail;
 
 class AppController extends Controller
 {
-    
     public function index(): Response
     {
 
-            $employees = Employee::with([
-                'timeAllocations' => function ($query) {
-                    $query->select(
-                        'id',
-                        'employeeId', // pour la relation timeAllocations
-                        'agreement',
-                        'bus',
-                        'jan',
-                        'feb',
-                        'mar',
-                        'apr',
-                        'may',
-                        'jun',
-                        'jul',
-                        'aug',
-                        'sep',
-                        'oct',
-                        'nov',
-                        'dec',
-                        'date',
-                        'total'
-                    )
-                    ->whereYear('date', Carbon::now()->year) // 👈 filtre année actuelle
-                    ->orderBy('created_at', 'desc');
-                },
-                'monthlyTotal' => function ($query) {
-                    $query->select(
-                        'id',
-                        'employeeId', // pour la relation timeAllocations
-                        'jan',
-                        'feb',
-                        'mar',
-                        'apr',
-                        'may',
-                        'jun',
-                        'jul',
-                        'aug',
-                        'sep',
-                        'oct',
-                        'nov',
-                        'dec',
-                        'date',
-                        'total'
-                    )
-                    ->whereYear('date', Carbon::now()->year) // 👈 filtre année actuelle
-                    ->orderBy('created_at', 'desc');
-                },
-                'supervisor' => function ($query) {
-                    $query->select('employeeId', 'firstName', 'lastName');
-                }
-            ])
+        $employees = DB::table('employees')
+            ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->select(
-                'employeeId',
-                'email',
-                'supervisorId', 
-                'matricule as resno',
-                'firstName as name',
-                'lastName as lastName',
-                'bgLevel as grade_level',
-                'grade',
-                'phone2 as division',
-                'jobTitle as position',
-                'organization',
-                'country_of_residence',
-                'base_station',
-                'unit_program'
+                'employees.employeeId',
+                // 'employees.email',
+                'employees.supervisorId', 
+                'employees.matricule as resno',
+                'employees.firstName as name',
+                'employees.lastName as lastName',
+                'supervisors.matricule as supervisors_matricule',
+                DB::raw("CONCAT(supervisors.firstName, ' ', supervisors.lastName) as supervisor_name"),
+                'employees.bgLevel as grade_level',
+                'employees.grade',
+                'employees.phone2 as division',
+                'employees.jobTitle as position',
+                'employees.organization',
+                'employees.country_of_residence',
+                'employees.base_station',
+                'employees.unit_program'
             )
-            ->where('firstName', '!=', 'admin')
-            // ->take(3)
+            ->where('employees.firstName', '!=', 'admin')
             ->get();
+
         return Inertia::render('Home', [
             'staff' =>$employees
         ]);
+    }
+
+    public function updateEmployee(Request $request){
+
+        // Récupérer l'employé via employeeId ou autre identifiant unique
+        $employee = Employee::where('employeeId', $request['employeeId'])->first();
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employé non trouvé'], 404);
+        }
+
+        // Récupérer le superviseur correspondant au matricule
+        $supervisor = Employee::where('matricule', $request['supervisors_matricule'])->first();
+
+        if (!$supervisor) {
+            return response()->json(['message' => 'Superviseur non trouvé'], 404);
+        }
+
+        // Vérifier si le supervisorId de l'employé correspond à l'ID du superviseur
+        if ($employee->supervisorId != $supervisor->employeeId) {
+            $employee->supervisorId = $supervisor->employeeId;
+        }
+
+        // Mettre à jour les informations de l'employé avec les données reçues
+        $employee->firstName = $request['name'] ?? $employee->name;
+        $employee->lastName = $request['lastName'] ?? $employee->lastName;
+        $employee->grade = $request['grade'] ?? $employee->grade;
+        $employee->bgLevel = $request['grade_level'] ?? $employee->grade_level;
+        $employee->jobTitle = $request['position'] ?? $employee->position;
+        $employee->phone2 = $request['division'] ?? $employee->division;
+        $employee->organization = $request['organization'] ?? $employee->organization;
+        $employee->unit_program = $request['unit_program'] ?? $employee->unit_program;
+        $employee->country_of_residence = $request['country_of_residence'] ?? $employee->country_of_residence;
+        $employee->base_station = $request['base_station'] ?? $employee->base_station;
+
+        // Sauvegarder les modifications
+        $employee->save();
+
+        return response()->json([
+            'message' => 'Employé mis à jour avec succès',
+            'employee' => $employee
+        ], 200);
     }
 
     public function importAllocation()
     {
             $employees = DB::table('employees')
             ->where('employees.firstName', '!=', 'admin')
-            ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.supervisorId')
+            ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->leftJoin('time_allocations', 'employees.employeeId', '=', 'time_allocations.employeeId')
             ->select(
                 // 'employees.employeeId',
@@ -163,81 +157,81 @@ class AppController extends Controller
             );
         }
 
-        unset($monthlyTotal['id']);
-        monthlyTotal::updateOrCreate(
-            [
-            // 'id' => $monthlyTotal['id'],
-            'employeeId' => $employeeId,
-            'year'=>$year
-            ],
-            $monthlyTotal
-        );
+        // unset($monthlyTotal['id']);
+        // monthlyTotal::updateOrCreate(
+        //     [
+        //     // 'id' => $monthlyTotal['id'],
+        //     'employeeId' => $employeeId,
+        //     'year'=>$year
+        //     ],
+        //     $monthlyTotal
+        // );
         
-        $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
-        $employee = Employee::select(
-                'employeeId',
-                'email',
-                'supervisorId', 
-                'matricule as resno',
-                'firstName as name',
-                'lastName as lastName',
-                'bgLevel as grade_level',
-                'grade',
-                'phone2 as division',
-                'jobTitle as position',
-                'organization',
-                'country_of_residence',
-                'base_station',
-                'unit_program'
-            )
-            ->with([
-                'timeAllocations' => function ($query) {
-                    $query->select(
-                    'id',
-                    'employeeId',
-                    'agreement',
-                    'bus',
-                    'jan',
-                    'feb',
-                    'mar',
-                    'apr',
-                    'may',
-                    'jun',
-                    'jul',
-                    'aug',
-                    'sep',
-                    'oct',
-                    'nov',
-                    'dec',
-                    'date',
-                    'total'
-                )->orderBy('created_at', 'desc');
+        // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
+        // $employee = Employee::select(
+        //         'employeeId',
+        //         'email',
+        //         'supervisorId', 
+        //         'matricule as resno',
+        //         'firstName as name',
+        //         'lastName as lastName',
+        //         'bgLevel as grade_level',
+        //         'grade',
+        //         'phone2 as division',
+        //         'jobTitle as position',
+        //         'organization',
+        //         'country_of_residence',
+        //         'base_station',
+        //         'unit_program'
+        //     )
+        //     ->with([
+        //         'timeAllocations' => function ($query) {
+        //             $query->select(
+        //             'id',
+        //             'employeeId',
+        //             'agreement',
+        //             'bus',
+        //             'jan',
+        //             'feb',
+        //             'mar',
+        //             'apr',
+        //             'may',
+        //             'jun',
+        //             'jul',
+        //             'aug',
+        //             'sep',
+        //             'oct',
+        //             'nov',
+        //             'dec',
+        //             'date',
+        //             'total'
+        //         )->orderBy('created_at', 'desc');
                 
-            },
-            'monthlyTotal' => function ($query) {
-                    $query->select(
-                        'id',
-                        'employeeId', // pour la relation timeAllocations
-                        'jan',
-                        'feb',
-                        'mar',
-                        'apr',
-                        'may',
-                        'jun',
-                        'jul',
-                        'aug',
-                        'sep',
-                        'oct',
-                        'nov',
-                        'dec',
-                        'date',
-                        'total'
-                    )
-                    ->whereYear('date', Carbon::now()->year) ;
-                }
-            ])
-            ->where('employeeId', $employeeId)
-            ->first();
+        //     },
+        //     'monthlyTotal' => function ($query) {
+        //             $query->select(
+        //                 'id',
+        //                 'employeeId', // pour la relation timeAllocations
+        //                 'jan',
+        //                 'feb',
+        //                 'mar',
+        //                 'apr',
+        //                 'may',
+        //                 'jun',
+        //                 'jul',
+        //                 'aug',
+        //                 'sep',
+        //                 'oct',
+        //                 'nov',
+        //                 'dec',
+        //                 'date',
+        //                 'total'
+        //             )
+        //             ->whereYear('date', Carbon::now()->year) ;
+        //         }
+        //     ])
+        //     ->where('employeeId', $employeeId)
+        //     ->first();
 
             // $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
             //     return [
@@ -356,7 +350,6 @@ class AppController extends Controller
         
         return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
     }
-
     public function sendMail(Request $request)
     {
         $employeeId = $request->employeeId;
@@ -455,4 +448,80 @@ class AppController extends Controller
         return response()->json(['message' => 'Email sent successfully','data'=>$employee->timeAllocations]);
     }
 
+    public function StaffTimeAllocations($id)
+    {
+        $employee = Employee::select(
+                'employeeId',
+                'email',
+                'supervisorId', 
+                'matricule as resno',
+                'firstName as name',
+                'lastName as lastName',
+                'bgLevel as grade_level',
+                'grade',
+                'phone2 as division',
+                'jobTitle as position',
+                'organization',
+                'country_of_residence',
+                'base_station',
+                'unit_program'
+            )
+            ->with(
+            [
+            'timeAllocations' => function ($query) {
+                    $query->select(
+                    'id',
+                    'employeeId',
+                    'agreement',
+                    'bus',
+                    'jan',
+                    'feb',
+                    'mar',
+                    'apr',
+                    'may',
+                    'jun',
+                    'jul',
+                    'aug',
+                    'sep',
+                    'oct',
+                    'nov',
+                    'dec',
+                    'date',
+                    'total'
+                )->orderBy('created_at', 'desc');
+                
+            }
+            ,
+            // 'monthlyTotal' => function ($query) {
+            //         $query->select(
+            //             'id',
+            //             'employeeId', // pour la relation timeAllocations
+            //             'jan',
+            //             'feb',
+            //             'mar',
+            //             'apr',
+            //             'may',
+            //             'jun',
+            //             'jul',
+            //             'aug',
+            //             'sep',
+            //             'oct',
+            //             'nov',
+            //             'dec',
+            //             'date',
+            //             'total'
+            //         )
+            //         ->whereYear('date', Carbon::now()->year) ;
+            // }
+            ]
+            )
+            ->where('employeeId', $id)
+            ->first();
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+
+        return response()->json(['data' => $employee]);
+    }
 }
