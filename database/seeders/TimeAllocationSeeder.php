@@ -144,7 +144,7 @@ class TimeAllocationSeeder extends Seeder
                         // "lastName"=> $lastName ,
                         // "password"=>"" ,
                         // "jobTitle"=> $employeeData[2] ,
-                        "bgLevel"=> $employeeData['jobTitle'] ,
+                        "bgLevel"=> $employeeData['bgLevel'] ,
                         "grade"=> $employeeData['grade'] ,
                         "organization"=> $employeeData['organization'] ,
                         "country_of_residence"=> $employeeData['country_of_residence'] ,
