@@ -1,20 +1,20 @@
 {
-  "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js": {
-    "file": "assets/ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js",
+  "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js": {
+    "file": "assets/ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js",
     "name": "ButtonEmailComponent.vue_vue_type_script_setup_true_lang",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js": {
-    "file": "assets/ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js",
+  "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js": {
+    "file": "assets/ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js",
     "name": "ButtonSaveComponent.vue_vue_type_script_setup_true_lang",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js": {
-    "file": "assets/ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js",
+  "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js": {
+    "file": "assets/ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js",
     "name": "ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang",
     "imports": [
       "resources/js/app.js"
@@ -30,7 +30,7 @@
     "isEntry": true
   },
   "resources/js/Pages/Home.vue": {
-    "file": "assets/Home-BVy-awEg.js",
+    "file": "assets/Home-BnuQeaPK.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.vue",
     "isDynamicEntry": true,
@@ -39,22 +39,22 @@
       "resources/js/app.js",
       "resources/js/Pages/components/EditEmployeeComponent.vue",
       "resources/js/Pages/components/AllocationConmponent.vue",
-      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js",
-      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js",
-      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js",
+      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js",
+      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js",
+      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ]
   },
   "resources/js/Pages/components/AllocationConmponent.vue": {
-    "file": "assets/AllocationConmponent-D-T6J_un.js",
+    "file": "assets/AllocationConmponent-Ac1j-MKQ.js",
     "name": "AllocationConmponent",
     "src": "resources/js/Pages/components/AllocationConmponent.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js",
-      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js",
-      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js",
+      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js",
+      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js",
+      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ],
     "css": [
@@ -62,27 +62,27 @@
     ]
   },
   "resources/js/Pages/components/ButtonEmailComponent.vue": {
-    "file": "assets/ButtonEmailComponent-BR1yQ0r7.js",
+    "file": "assets/ButtonEmailComponent-ChFeAFTK.js",
     "name": "ButtonEmailComponent",
     "src": "resources/js/Pages/components/ButtonEmailComponent.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js",
+      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/Pages/components/ButtonSaveComponent.vue": {
-    "file": "assets/ButtonSaveComponent-Cv8qqoa2.js",
+    "file": "assets/ButtonSaveComponent-BoPqgEAL.js",
     "name": "ButtonSaveComponent",
     "src": "resources/js/Pages/components/ButtonSaveComponent.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js",
+      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/Pages/components/EditEmployeeComponent.vue": {
-    "file": "assets/EditEmployeeComponent-CLAfGNEn.js",
+    "file": "assets/EditEmployeeComponent-CeLH9yPw.js",
     "name": "EditEmployeeComponent",
     "src": "resources/js/Pages/components/EditEmployeeComponent.vue",
     "isDynamicEntry": true,
@@ -91,7 +91,7 @@
     ]
   },
   "resources/js/Pages/components/EmployeeComponent.vue": {
-    "file": "assets/EmployeeComponent-D_9_h-no.js",
+    "file": "assets/EmployeeComponent-sNpYeNkv.js",
     "name": "EmployeeComponent",
     "src": "resources/js/Pages/components/EmployeeComponent.vue",
     "isDynamicEntry": true,
@@ -100,26 +100,26 @@
       "resources/js/Pages/components/EditEmployeeComponent.vue",
       "resources/js/Pages/components/AllocationConmponent.vue",
       "__plugin-vue_export-helper-DlAUqK2U.js",
-      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js",
-      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-DJ7T28WK.js",
-      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-QXrsGeyP.js"
+      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js",
+      "_ButtonSaveComponent.vue_vue_type_script_setup_true_lang-CpqSSVKm.js",
+      "_ButtonEmailComponent.vue_vue_type_script_setup_true_lang-uGIp80sj.js"
     ],
     "css": [
-      "assets/EmployeeComponent-BztSccvy.css"
+      "assets/EmployeeComponent-CAuT5N9Y.css"
     ]
   },
   "resources/js/Pages/components/ItemTimeAllocationComponent.vue": {
-    "file": "assets/ItemTimeAllocationComponent-CpUVIJfL.js",
+    "file": "assets/ItemTimeAllocationComponent-BOt-bYb2.js",
     "name": "ItemTimeAllocationComponent",
     "src": "resources/js/Pages/components/ItemTimeAllocationComponent.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-aDbpmdLx.js",
+      "_ItemTimeAllocationComponent.vue_vue_type_script_setup_true_lang-mxkj8DEY.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/Pages/components/TableTwo.vue": {
-    "file": "assets/TableTwo-A-uSSTOd.js",
+    "file": "assets/TableTwo-DkEhgEHB.js",
     "name": "TableTwo",
     "src": "resources/js/Pages/components/TableTwo.vue",
     "isDynamicEntry": true,
@@ -128,7 +128,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2 copy.vue": {
-    "file": "assets/TableTwo2 copy-BiSW1YQg.js",
+    "file": "assets/TableTwo2 copy-C_1mvjRS.js",
     "name": "TableTwo2 copy",
     "src": "resources/js/Pages/components/TableTwo2 copy.vue",
     "isDynamicEntry": true,
@@ -141,7 +141,7 @@
     ]
   },
   "resources/js/Pages/components/TableTwo2.vue": {
-    "file": "assets/TableTwo2-CAKNA6m5.js",
+    "file": "assets/TableTwo2-Djv1TAiL.js",
     "name": "TableTwo2",
     "src": "resources/js/Pages/components/TableTwo2.vue",
     "isDynamicEntry": true,
@@ -154,7 +154,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BWPZoc_W.js",
+    "file": "assets/app-DFD9EiAX.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

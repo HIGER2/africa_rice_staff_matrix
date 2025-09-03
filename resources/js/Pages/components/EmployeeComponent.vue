@@ -149,8 +149,8 @@ import EditEmployeeComponent from './EditEmployeeComponent.vue'
                     @click="handleImport"
                     type="button" 
                     class="p-2 cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
-                    <i class="uil uil-import"></i> 
-                    <span v-if="!loadingImport">import</span>
+                    <i class="uil uil-export"></i> 
+                    <span v-if="!loadingImport">Export</span>
                     <span v-else>Loading...</span>
                     </button>
                 </div>
