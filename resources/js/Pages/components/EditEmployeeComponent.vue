@@ -101,7 +101,7 @@ const validateForm = () => {
 }
 
 const handleSubmit = async () => {
-        if (!confirm('Are you sure you want to delete these changes?')) {
+        if (!confirm('Are you sure you want to apply these changes?')) {
             return;
         }
         loading.value =true
