@@ -288,12 +288,11 @@ const handleGetTimeAllocations = async (staffId: string) => {
             callback(true)
             return false
         }
-
-        if (getTotalForAllAllocations(localSelectedRow.value) !=1200) {
-            alert("⚠️ The total allocations must add up to exactly 1200.Please check your inputs before sending the email.")
-            callback(true)
-            return false
-        }
+        // if (getTotalForAllAllocations(localSelectedRow.value) !=1200) {
+        //     alert("⚠️ The total allocations must add up to exactly 1200.Please check your inputs before sending the email.")
+        //     callback(true)
+        //     return false
+        // }
         if (!confirm('Do you really want to send this email?')) {
             callback(true)
             return;

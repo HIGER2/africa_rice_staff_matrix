@@ -138,7 +138,7 @@ import EditEmployeeComponent from './EditEmployeeComponent.vue'
     <div class="w-full h-screen  flex flex-col" >
     <div class="w-full p-3">
         <div class="flex p-4 rounded-lg mb-3 justify-between items-center z-30  top-0 sticky bg-white ">
-            <h1 class="text-xl font-bold mb-4">Staff Time Allocation</h1>
+            <h1 class="text-xl font-bold mb-4">Staff Activity Contribution (SAC)</h1>
             <div class="flex items-center gap-2 ">
                     <input 
                     v-model="search"
@@ -241,7 +241,7 @@ import EditEmployeeComponent from './EditEmployeeComponent.vue'
                                     type="button"
                                     @click="openModal(row)"
                                     class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
-                                    <i class="uil uil-eye"></i>Allocation</button>
+                                    <i class="uil uil-eye"></i>Activity</button>
                                     <button 
                                     @click="openEmployeeModal(row)"
                                     type="button"
