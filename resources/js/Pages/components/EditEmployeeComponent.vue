@@ -17,6 +17,7 @@ const formData = reactive({
   employeeId: null,
   name: '',
   lastName: '',
+  email: '',
   grade_level: '',
   grade: '',
   division: '',
@@ -27,6 +28,7 @@ const formData = reactive({
   unit_program: '',
   supervisors_matricule:null
 })
+
 const formFields = [
   // { label: "Employee ID", key: "employeeId", type: "number" },
   { label: "First Name", key: "name", type: "text" },
@@ -175,7 +177,7 @@ const handleSubmit = async () => {
                 <!-- <div class="flex items-center space-x-3 pb-3 border-b border-gray-200">
                   <h3 class="text-lg font-semibold text-gray-800">Informations personnelles</h3>
                 </div> -->
-                
+                <!-- <pre> {{ formData }}</pre> -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
                   <div v-for="(item,index) in formFields" 
                   :class="[
