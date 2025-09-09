@@ -1,6 +1,6 @@
 <h2>Hello  {{ $employee->lastName }} {{ $employee->name }},</h2>
 
-<p>Your time allocation has been updated.</p>
+<p>Your Activity Contribution has been updated.</p>
 
 {{-- <h3>Année : {{ $timeAllocations[0]['Year'] ?? 'Non spécifiée' }}</h3> --}}
 {{-- 
