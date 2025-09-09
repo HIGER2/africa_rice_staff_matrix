@@ -304,7 +304,7 @@ const handleGetTimeAllocations = async (staffId: string) => {
             alert(response?.data?.message || response?.message)
         })
         .catch(error => {
-            alert('Error send allocations')
+           alert(error?.response.data?.message || error?.message)
         })
         .finally(() => {
             callback(true)

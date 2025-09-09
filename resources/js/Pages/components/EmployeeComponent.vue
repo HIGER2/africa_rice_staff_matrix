@@ -48,6 +48,7 @@ import EditEmployeeComponent from './EditEmployeeComponent.vue'
     { label: "RES Number", key: "resno" },
     { label: "First Name", key: "name" },
     { label: "Last Name", key: "lastName" },
+    { label: "Email", key: "email" },
     // { label: "Supervisor Matricule", key: "supervisors_matricule" },
     { label: "Supervisor Name", key: "supervisor_name" },
     { label: "Grade Level", key: "grade_level" },

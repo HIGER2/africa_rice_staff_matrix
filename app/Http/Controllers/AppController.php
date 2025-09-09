@@ -21,7 +21,7 @@ class AppController extends Controller
             ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->select(
                 'employees.employeeId',
-                // 'employees.email',
+                'employees.email',
                 'employees.supervisorId', 
                 'employees.matricule as resno',
                 'employees.firstName as name',
@@ -69,6 +69,7 @@ class AppController extends Controller
         // Mettre à jour les informations de l'employé avec les données reçues
         $employee->firstName = $request['name'] ?? $employee->name;
         $employee->lastName = $request['lastName'] ?? $employee->lastName;
+        $employee->email = $request['email'] ?? $employee->email;
         $employee->grade = $request['grade'] ?? $employee->grade;
         $employee->bgLevel = $request['grade_level'] ?? $employee->grade_level;
         $employee->jobTitle = $request['position'] ?? $employee->position;
@@ -352,6 +353,7 @@ class AppController extends Controller
     }
     public function sendMail(Request $request)
     {
+       try {
         $employeeId = $request->employeeId;
         // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
         $employee = Employee::select(
@@ -438,14 +440,24 @@ class AppController extends Controller
                 // 'Date' => $allocation->date,
             ];
         })->toArray();
-        
             $supervisorEmail = $employee->supervisor->email ?? null;
             $mail = Mail::to($employee->email);
             if ($supervisorEmail) {
                 $mail->cc($supervisorEmail);
             }
+
+            if (empty($employee->email) || !filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
+                return response()->json([
+                    'message' => 'Invalid or missing email',
+                ],422);
+            }
             $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
         return response()->json(['message' => 'Email sent successfully','data'=>$employee->timeAllocations]);
+       } catch (\Throwable $th) {
+         return response()->json([
+                    'message' => 'Error send allocations',
+        ],500   );
+       }
     }
 
     public function StaffTimeAllocations($id)

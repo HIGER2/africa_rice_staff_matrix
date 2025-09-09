@@ -29,9 +29,9 @@ const formData = reactive({
 })
 const formFields = [
   // { label: "Employee ID", key: "employeeId", type: "number" },
-  // { label: "Email", key: "email", type: "email" },
   { label: "First Name", key: "name", type: "text" },
   { label: "Last Name", key: "lastName", type: "text" },
+  { label: "Email", key: "email", type: "email" },
   // { label: "RES Number", key: "resno", type: "text" },
   { label: "Grade Level", key: "grade_level", type: "text" },
   { label: "Grade", key: "grade", type: "text" },
@@ -190,6 +190,7 @@ const handleSubmit = async () => {
                     <div class="relative group">
                       <input
                         id="name"
+                        :placeholder="item.label"
                         v-model="formData[item.key]"
                         type="text"
                         class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500 disabled:border-gray-200"
