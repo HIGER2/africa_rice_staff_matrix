@@ -32,7 +32,9 @@ const uploadFile = async () => {
     })
     .then(async(response) => {
         Inertia.reload()
+         selectedFile.value = null
         alert(response?.data?.message || response?.message)
+
         document.getElementById("my_modal_1").close();
 
     })
@@ -71,7 +73,9 @@ const closeModal = () => {
                 <!-- Input de fichier -->
                 <input type="file" name="file" 
                 @change="handleFileChange" 
-                class="file-input file-input-bordered w-full" required />
+                class="file-input file-input-bordered w-full"
+                accept=".xls, .xlsx"
+                required />
 
                 <div class="modal-action">
                 <!-- Bouton de soumission -->
