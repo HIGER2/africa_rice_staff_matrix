@@ -7,6 +7,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import * as XLSX from 'xlsx'
 import AllocationConmponent from './AllocationConmponent.vue'
 import EditEmployeeComponent from './EditEmployeeComponent.vue'
+import ImportFileComponent from './ImportFileComponent.vue'
 
     const props = defineProps({
     staff: Array,
@@ -149,11 +150,12 @@ import EditEmployeeComponent from './EditEmployeeComponent.vue'
                     :disabled="loadingImport"
                     @click="handleImport"
                     type="button" 
-                    class="p-2 cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+                    class="p-2  disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
                     <i class="uil uil-export"></i> 
                     <span v-if="!loadingImport">Export</span>
                     <span v-else>Loading...</span>
                     </button>
+                    <ImportFileComponent/>
                 </div>
 
         </div>

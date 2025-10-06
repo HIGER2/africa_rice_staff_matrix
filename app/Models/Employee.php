@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
-    protected $guard=[];
+    protected $guarded  = [];
     protected $primaryKey = 'employeeId';
+    public $timestamps = false; // ⚠️ désactive created_at / updated_at
 
     public function timeAllocations()
     {
-    return $this->hasMany(TimeAllocation::class, 'employeeId', 'employeeId');
+        return $this->hasMany(TimeAllocation::class, 'employeeId', 'employeeId');
     }
 
     public function supervisor()
@@ -21,6 +22,6 @@ class Employee extends Model
 
     public function monthlyTotal()
     {
-        return $this->belongsTo(monthlyTotal::class,'employeeId', 'employeeId');
+        return $this->belongsTo(monthlyTotal::class, 'employeeId', 'employeeId');
     }
 }

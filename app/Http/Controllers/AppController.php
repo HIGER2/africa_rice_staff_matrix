@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\TimeAllocationUpdatedMail;
 use App\Models\Employee;
 use App\Models\monthlyTotal;
+use App\Services\AllocationService;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Mail;
 
 class AppController extends Controller
 {
+
+    function __construct(protected AllocationService $allocationService) {}
+
     public function index(): Response
     {
 
@@ -22,7 +26,7 @@ class AppController extends Controller
             ->select(
                 'employees.employeeId',
                 'employees.email',
-                'employees.supervisorId', 
+                'employees.supervisorId',
                 'employees.matricule as resno',
                 'employees.firstName as name',
                 'employees.lastName as lastName',
@@ -41,11 +45,12 @@ class AppController extends Controller
             ->get();
 
         return Inertia::render('Home', [
-            'staff' =>$employees
+            'staff' => $employees
         ]);
     }
 
-    public function updateEmployee(Request $request){
+    public function updateEmployee(Request $request)
+    {
 
         // Récupérer l'employé via employeeId ou autre identifiant unique
         $employee = Employee::where('employeeId', $request['employeeId'])->first();
@@ -90,7 +95,7 @@ class AppController extends Controller
 
     public function importAllocation()
     {
-            $employees = DB::table('employees')
+        $employees = DB::table('employees')
             ->where('employees.firstName', '!=', 'admin')
             ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->leftJoin('time_allocations', 'employees.employeeId', '=', 'time_allocations.employeeId')
@@ -150,9 +155,10 @@ class AppController extends Controller
             $value['year'] = date('Y');
             $value['employeeId'] = $employeeId;
             $employee->timeAllocations()->updateOrCreate(
-                ['id' => $value['id'] ?? null, 
-                'employeeId' => $employeeId,
-                'year'=>$year
+                [
+                    'id' => $value['id'] ?? null,
+                    'employeeId' => $employeeId,
+                    'year' => $year
                 ],
                 $value
             );
@@ -167,7 +173,7 @@ class AppController extends Controller
         //     ],
         //     $monthlyTotal
         // );
-        
+
         // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
         // $employee = Employee::select(
         //         'employeeId',
@@ -207,7 +213,7 @@ class AppController extends Controller
         //             'date',
         //             'total'
         //         )->orderBy('created_at', 'desc');
-                
+
         //     },
         //     'monthlyTotal' => function ($query) {
         //             $query->select(
@@ -234,40 +240,41 @@ class AppController extends Controller
         //     ->where('employeeId', $employeeId)
         //     ->first();
 
-            // $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
-            //     return [
-            //         // 'Year' => $allocation->year ?? 'N/A',
-            //         'Agreement' => $allocation->agreement,
-            //         'Bus' => $allocation->bus,
-            //         'Jan' => $allocation->jan,
-            //         'Feb' => $allocation->feb,
-            //         'Mar' => $allocation->mar,
-            //         'Apr' => $allocation->apr,
-            //         'May' => $allocation->may,
-            //         'Jun' => $allocation->jun,
-            //         'Jul' => $allocation->jul,
-            //         'Aug' => $allocation->aug,
-            //         'Sep' => $allocation->sep,
-            //         'Oct' => $allocation->oct,
-            //         'Nov' => $allocation->nov,
-            //         'Dec' => $allocation->dec,
-            //         'Total' => $allocation->total,
-            //         // 'Date' => $allocation->date,
-            //     ];
-            // })->toArray();
-            
-            //     $supervisorEmail = $employee->supervisor->email ?? null;
-            //     $mail = Mail::to($employee->email);
-            //     if ($supervisorEmail) {
-            //         $mail->cc($supervisorEmail);
-            //     }
-                
-            // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
-        
-        return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
+        // $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
+        //     return [
+        //         // 'Year' => $allocation->year ?? 'N/A',
+        //         'Agreement' => $allocation->agreement,
+        //         'Bus' => $allocation->bus,
+        //         'Jan' => $allocation->jan,
+        //         'Feb' => $allocation->feb,
+        //         'Mar' => $allocation->mar,
+        //         'Apr' => $allocation->apr,
+        //         'May' => $allocation->may,
+        //         'Jun' => $allocation->jun,
+        //         'Jul' => $allocation->jul,
+        //         'Aug' => $allocation->aug,
+        //         'Sep' => $allocation->sep,
+        //         'Oct' => $allocation->oct,
+        //         'Nov' => $allocation->nov,
+        //         'Dec' => $allocation->dec,
+        //         'Total' => $allocation->total,
+        //         // 'Date' => $allocation->date,
+        //     ];
+        // })->toArray();
+
+        //     $supervisorEmail = $employee->supervisor->email ?? null;
+        //     $mail = Mail::to($employee->email);
+        //     if ($supervisorEmail) {
+        //         $mail->cc($supervisorEmail);
+        //     }
+
+        // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
+
+        return response()->json(['message' => 'Allocations saved successfully', 'data' => $employee]);
     }
 
-    public function deleteTimeAllocation(Request $request){
+    public function deleteTimeAllocation(Request $request)
+    {
         $id = $request->id;
         $employeeId = $request->employeeId;
 
@@ -284,47 +291,46 @@ class AppController extends Controller
         // Supprimer la timeAllocation
         $timeAllocation->delete();
 
-          $employee = Employee::select(
-                'employeeId',
-                'email',
-                'supervisorId', 
-                'matricule as resno',
-                'firstName as name',
-                'lastName as lastName',
-                'bgLevel as grade_level',
-                'grade',
-                'phone2 as division',
-                'jobTitle as position',
-                'organization',
-                'country_of_residence',
-                'base_station',
-                'unit_program'
-            )
+        $employee = Employee::select(
+            'employeeId',
+            'email',
+            'supervisorId',
+            'matricule as resno',
+            'firstName as name',
+            'lastName as lastName',
+            'bgLevel as grade_level',
+            'grade',
+            'phone2 as division',
+            'jobTitle as position',
+            'organization',
+            'country_of_residence',
+            'base_station',
+            'unit_program'
+        )
             ->with([
                 'timeAllocations' => function ($query) {
                     $query->select(
-                    'id',
-                    'employeeId',
-                    'agreement',
-                    'bus',
-                    'jan',
-                    'feb',
-                    'mar',
-                    'apr',
-                    'may',
-                    'jun',
-                    'jul',
-                    'aug',
-                    'sep',
-                    'oct',
-                    'nov',
-                    'dec',
-                    'date',
-                    'total'
-                )->orderBy('created_at', 'desc');
-                
-            },
-            'monthlyTotal' => function ($query) {
+                        'id',
+                        'employeeId',
+                        'agreement',
+                        'bus',
+                        'jan',
+                        'feb',
+                        'mar',
+                        'apr',
+                        'may',
+                        'jun',
+                        'jul',
+                        'aug',
+                        'sep',
+                        'oct',
+                        'nov',
+                        'dec',
+                        'date',
+                        'total'
+                    )->orderBy('created_at', 'desc');
+                },
+                'monthlyTotal' => function ($query) {
                     $query->select(
                         'id',
                         'employeeId', // pour la relation timeAllocations
@@ -343,23 +349,23 @@ class AppController extends Controller
                         'date',
                         'total'
                     )
-                    ->whereYear('date', Carbon::now()->year) ;
+                        ->whereYear('date', Carbon::now()->year);
                 }
             ])
             ->where('employeeId', $employeeId)
             ->first();
-        
-        return response()->json(['message' => 'Allocations saved successfully','data'=>$employee]);
+
+        return response()->json(['message' => 'Allocations saved successfully', 'data' => $employee]);
     }
     public function sendMail(Request $request)
     {
-       try {
-        $employeeId = $request->employeeId;
-        // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
-        $employee = Employee::select(
+        try {
+            $employeeId = $request->employeeId;
+            // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
+            $employee = Employee::select(
                 'employeeId',
                 'email',
-                'supervisorId', 
+                'supervisorId',
                 'matricule as resno',
                 'firstName as name',
                 'lastName as lastName',
@@ -368,78 +374,77 @@ class AppController extends Controller
                 'phone2 as division',
                 'jobTitle as position'
             )
-            ->with([
-                'timeAllocations' => function ($query) {
-                    $query->select(
-                    'id',
-                    'employeeId',
-                    'agreement',
-                    'bus',
-                    'jan',
-                    'feb',
-                    'mar',
-                    'apr',
-                    'may',
-                    'jun',
-                    'jul',
-                    'aug',
-                    'sep',
-                    'oct',
-                    'nov',
-                    'dec',
-                    'date',
-                    'total'
-                )->orderBy('created_at', 'desc');
-                
-            },
-            'monthlyTotal' => function ($query) {
-                    $query->select(
-                        'id',
-                        'employeeId', // pour la relation timeAllocations
-                        'jan',
-                        'feb',
-                        'mar',
-                        'apr',
-                        'may',
-                        'jun',
-                        'jul',
-                        'aug',
-                        'sep',
-                        'oct',
-                        'nov',
-                        'dec',
-                        'date',
-                        'total'
-                    )
-                    ->whereYear('date', Carbon::now()->year) ;
-                }
-            ])
-            ->where('employeeId', $employeeId)
-            ->first();
+                ->with([
+                    'timeAllocations' => function ($query) {
+                        $query->select(
+                            'id',
+                            'employeeId',
+                            'agreement',
+                            'bus',
+                            'jan',
+                            'feb',
+                            'mar',
+                            'apr',
+                            'may',
+                            'jun',
+                            'jul',
+                            'aug',
+                            'sep',
+                            'oct',
+                            'nov',
+                            'dec',
+                            'date',
+                            'total'
+                        )->orderBy('created_at', 'desc');
+                    },
+                    'monthlyTotal' => function ($query) {
+                        $query->select(
+                            'id',
+                            'employeeId', // pour la relation timeAllocations
+                            'jan',
+                            'feb',
+                            'mar',
+                            'apr',
+                            'may',
+                            'jun',
+                            'jul',
+                            'aug',
+                            'sep',
+                            'oct',
+                            'nov',
+                            'dec',
+                            'date',
+                            'total'
+                        )
+                            ->whereYear('date', Carbon::now()->year);
+                    }
+                ])
+                ->where('employeeId', $employeeId)
+                ->first();
             if ($employee->timeAllocations->isEmpty()) {
                 return response()->json(['message' => 'Email not send allocations empty']);
             }
-        $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
-            return [
-                // 'Year' => $allocation->year ?? 'N/A',
-                'Agreement' => $allocation->agreement,
-                'Bus' => $allocation->bus,
-                'Jan' => $allocation->jan,
-                'Feb' => $allocation->feb,
-                'Mar' => $allocation->mar,
-                'Apr' => $allocation->apr,
-                'May' => $allocation->may,
-                'Jun' => $allocation->jun,
-                'Jul' => $allocation->jul,
-                'Aug' => $allocation->aug,
-                'Sep' => $allocation->sep,
-                'Oct' => $allocation->oct,
-                'Nov' => $allocation->nov,
-                'Dec' => $allocation->dec,
-                'Total' => $allocation->total,
-                // 'Date' => $allocation->date,
-            ];
-        })->toArray();
+            $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
+                return [
+                    // 'Year' => $allocation->year ?? 'N/A',
+                    'Agreement' => $allocation->agreement,
+                    'Bus' => $allocation->bus,
+                    'Jan' => $allocation->jan,
+                    'Feb' => $allocation->feb,
+                    'Mar' => $allocation->mar,
+                    'Apr' => $allocation->apr,
+                    'May' => $allocation->may,
+                    'Jun' => $allocation->jun,
+                    'Jul' => $allocation->jul,
+                    'Aug' => $allocation->aug,
+                    'Sep' => $allocation->sep,
+                    'Oct' => $allocation->oct,
+                    'Nov' => $allocation->nov,
+                    'Dec' => $allocation->dec,
+                    'Total' => $allocation->total,
+                    // 'Date' => $allocation->date,
+                ];
+            })->toArray();
             $supervisorEmail = $employee->supervisor->email ?? null;
             $mail = Mail::to($employee->email);
             if ($supervisorEmail) {
@@ -449,83 +454,81 @@ class AppController extends Controller
             if (empty($employee->email) || !filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
                 return response()->json([
                     'message' => 'Invalid or missing email',
-                ],422);
+                ], 422);
             }
             $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
-        return response()->json(['message' => 'Email sent successfully','data'=>$employee->timeAllocations]);
-       } catch (\Throwable $th) {
-         return response()->json([
-                    'message' => 'Error send allocations',
-        ],500   );
-       }
+            return response()->json(['message' => 'Email sent successfully', 'data' => $employee->timeAllocations]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Error send allocations',
+            ], 500);
+        }
     }
 
     public function StaffTimeAllocations($id)
     {
         $employee = Employee::select(
-                'employeeId',
-                'email',
-                'supervisorId', 
-                'matricule as resno',
-                'firstName as name',
-                'lastName as lastName',
-                'bgLevel as grade_level',
-                'grade',
-                'phone2 as division',
-                'jobTitle as position',
-                'organization',
-                'country_of_residence',
-                'base_station',
-                'unit_program'
-            )
+            'employeeId',
+            'email',
+            'supervisorId',
+            'matricule as resno',
+            'firstName as name',
+            'lastName as lastName',
+            'bgLevel as grade_level',
+            'grade',
+            'phone2 as division',
+            'jobTitle as position',
+            'organization',
+            'country_of_residence',
+            'base_station',
+            'unit_program'
+        )
             ->with(
-            [
-            'timeAllocations' => function ($query) {
-                    $query->select(
-                    'id',
-                    'employeeId',
-                    'agreement',
-                    'bus',
-                    'jan',
-                    'feb',
-                    'mar',
-                    'apr',
-                    'may',
-                    'jun',
-                    'jul',
-                    'aug',
-                    'sep',
-                    'oct',
-                    'nov',
-                    'dec',
-                    'date',
-                    'total'
-                )->orderBy('created_at', 'desc');
-                
-            }
-            ,
-            // 'monthlyTotal' => function ($query) {
-            //         $query->select(
-            //             'id',
-            //             'employeeId', // pour la relation timeAllocations
-            //             'jan',
-            //             'feb',
-            //             'mar',
-            //             'apr',
-            //             'may',
-            //             'jun',
-            //             'jul',
-            //             'aug',
-            //             'sep',
-            //             'oct',
-            //             'nov',
-            //             'dec',
-            //             'date',
-            //             'total'
-            //         )
-            //         ->whereYear('date', Carbon::now()->year) ;
-            // }
-            ]
+                [
+                    'timeAllocations' => function ($query) {
+                        $query->select(
+                            'id',
+                            'employeeId',
+                            'agreement',
+                            'bus',
+                            'jan',
+                            'feb',
+                            'mar',
+                            'apr',
+                            'may',
+                            'jun',
+                            'jul',
+                            'aug',
+                            'sep',
+                            'oct',
+                            'nov',
+                            'dec',
+                            'date',
+                            'total'
+                        )->orderBy('created_at', 'desc');
+                    },
+                    // 'monthlyTotal' => function ($query) {
+                    //         $query->select(
+                    //             'id',
+                    //             'employeeId', // pour la relation timeAllocations
+                    //             'jan',
+                    //             'feb',
+                    //             'mar',
+                    //             'apr',
+                    //             'may',
+                    //             'jun',
+                    //             'jul',
+                    //             'aug',
+                    //             'sep',
+                    //             'oct',
+                    //             'nov',
+                    //             'dec',
+                    //             'date',
+                    //             'total'
+                    //         )
+                    //         ->whereYear('date', Carbon::now()->year) ;
+                    // }
+                ]
             )
             ->where('employeeId', $id)
             ->first();
@@ -535,5 +538,15 @@ class AppController extends Controller
         }
 
         return response()->json(['data' => $employee]);
+    }
+
+
+    public function uploadAllocation(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:2048', // max 2MB
+        ]);
+
+        return $this->allocationService->uploadAllocation($request);
     }
 }

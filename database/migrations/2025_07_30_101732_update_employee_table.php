@@ -33,6 +33,12 @@ return new class extends Migration
                     $table->string('base_station')->nullable();
                 });
             }
+
+            if (!Schema::hasColumn('employees', 'country_of_residence')) {
+                Schema::table('employees', function (Blueprint $table) {
+                    $table->string('country_of_residence')->nullable();
+                });
+            }
         }
     }
 
