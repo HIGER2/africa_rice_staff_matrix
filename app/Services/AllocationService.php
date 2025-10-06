@@ -36,7 +36,7 @@ class AllocationService
         $employeeDataSlice = array_slice($data, 0, 11);
         $timeAllocation = array_slice($data, 12);
 
-        $parts = explode(',', $employeeDataSlice[1]);
+        $parts = explode(' ', $employeeDataSlice[1]);
         $lastName = $parts[0]; // Nom de famille
         $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
         $employeeData = [
@@ -46,6 +46,7 @@ class AllocationService
             "bgLevel" => $employeeDataSlice[2],
             "grade" => $employeeDataSlice[3],
             "division" => $employeeDataSlice[4],
+            "phone2" => $employeeDataSlice[4],
             "jobTitle" => $employeeDataSlice[5],
             "organization" => $employeeDataSlice[6],
             "country_of_residence" => $employeeDataSlice[7],
@@ -76,8 +77,8 @@ class AllocationService
             // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
             $employee->update([
                 // "matricule"=> $employeeData[0],
-                // "firstName"=>$firstName ,
-                // "lastName"=> $lastName ,
+                "firstName" => $firstName,
+                "lastName" => $lastName,
                 // "password"=>"" ,
                 // "jobTitle"=> $employeeData[2] ,
                 "bgLevel" => $employeeData['bgLevel'],
@@ -100,42 +101,70 @@ class AllocationService
         if ($employee) {
             $agreement = $data[11] ?? null;
             $bus = $data[12] ?? null;
+            $payload = [
+                'employeeId' => $employee->employeeId,
+                'year' => date('Y'),
+                'agreement' => $agreement,
+                'bus' => $bus,
+                'jan' => helpers::normalizeNumber($data[13]),
+                'feb' => helpers::normalizeNumber($data[14]),
+                'mar' => helpers::normalizeNumber($data[15]),
+                'apr' => helpers::normalizeNumber($data[16]),
+                'may' => helpers::normalizeNumber($data[17]),
+                'jun' => helpers::normalizeNumber($data[18]),
+                'jul' => helpers::normalizeNumber($data[19]),
+                'aug' => helpers::normalizeNumber($data[20]),
+                'sep' => helpers::normalizeNumber($data[21]),
+                'oct' => helpers::normalizeNumber($data[22]),
+                'nov' => helpers::normalizeNumber($data[23]),
+                'dec' => helpers::normalizeNumber($data[24]),
+                'total' => helpers::normalizeNumber($data[25]),
+            ];
             // ✅ Vérifie si ce TimeAllocation existe déjà
-            $alreadyExists = $employee->timeAllocations()
-                ->where('agreement', $agreement)
-                ->where('bus', $bus)
-                ->where('year', date('Y'))
-                ->exists();
-            if (!$alreadyExists) {
-                $payload = [
-                    'employeeId' => $employee->employeeId,
-                    'year' => date('Y'),
+            $alreadyExists = $employee->timeAllocations()->updateOrCreate(
+                [
                     'agreement' => $agreement,
                     'bus' => $bus,
-                    'jan' => helpers::normalizeNumber($data[13]),
-                    'feb' => helpers::normalizeNumber($data[14]),
-                    'mar' => helpers::normalizeNumber($data[15]),
-                    'apr' => helpers::normalizeNumber($data[16]),
-                    'may' => helpers::normalizeNumber($data[17]),
-                    'jun' => helpers::normalizeNumber($data[18]),
-                    'jul' => helpers::normalizeNumber($data[19]),
-                    'aug' => helpers::normalizeNumber($data[20]),
-                    'sep' => helpers::normalizeNumber($data[21]),
-                    'oct' => helpers::normalizeNumber($data[22]),
-                    'nov' => helpers::normalizeNumber($data[23]),
-                    'dec' => helpers::normalizeNumber($data[24]),
-                    'total' => helpers::normalizeNumber($data[25]),
-                ];
-                TimeAllocation::create($payload);
+                    'year' => date('Y'),
+                ],
+                $payload
+            );
 
-                // TimeAllocation::updateOrcreate([
-                //     [
-                //         'agreement' => $agreement,
-                //         'bus' => $bus,
-                //     ],
-                //     $payload
-                // ]);
-            }
+            // ->where('agreement', $agreement)
+            // ->where('bus', $bus)
+            // ->where('year', date('Y'))
+            // ->exists();
+
+            // if (!$alreadyExists) {
+            //     $payload = [
+            //         'employeeId' => $employee->employeeId,
+            //         'year' => date('Y'),
+            //         // 'agreement' => $agreement,
+            //         // 'bus' => $bus,
+            //         'jan' => helpers::normalizeNumber($data[13]),
+            //         'feb' => helpers::normalizeNumber($data[14]),
+            //         'mar' => helpers::normalizeNumber($data[15]),
+            //         'apr' => helpers::normalizeNumber($data[16]),
+            //         'may' => helpers::normalizeNumber($data[17]),
+            //         'jun' => helpers::normalizeNumber($data[18]),
+            //         'jul' => helpers::normalizeNumber($data[19]),
+            //         'aug' => helpers::normalizeNumber($data[20]),
+            //         'sep' => helpers::normalizeNumber($data[21]),
+            //         'oct' => helpers::normalizeNumber($data[22]),
+            //         'nov' => helpers::normalizeNumber($data[23]),
+            //         'dec' => helpers::normalizeNumber($data[24]),
+            //         'total' => helpers::normalizeNumber($data[25]),
+            //     ];
+            //     // TimeAllocation::create($payload);
+
+            //     TimeAllocation::updateOrcreate([
+            //         [
+            //             'agreement' => $agreement,
+            //             'bus' => $bus,
+            //         ],
+            //         $payload
+            //     ]);
+            // }
         }
     }
 
@@ -144,7 +173,7 @@ class AllocationService
         $data = helpers::extractDataXlsx($filePath);
 
         foreach ($data as $key => $row) {
-            // if ($key == 0 || $key == 1) continue;
+            if ($key == 0) continue;
             self::timeAllocation($row);
         }
     }

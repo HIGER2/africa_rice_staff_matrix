@@ -146,6 +146,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
                     v-model="search"
                     class="border border-gray-300 p-2 rounded-lg "
                     type="search" placeholder="search..." name="" id="">
+                    <ImportFileComponent/>
                     <button 
                     :disabled="loadingImport"
                     @click="handleImport"
@@ -155,7 +156,6 @@ import ImportFileComponent from './ImportFileComponent.vue'
                     <span v-if="!loadingImport">Export</span>
                     <span v-else>Loading...</span>
                     </button>
-                    <ImportFileComponent/>
                 </div>
 
         </div>
