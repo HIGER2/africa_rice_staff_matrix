@@ -38,10 +38,10 @@ class AllocationService
 
         $parts = explode(' ', $employeeDataSlice[1]);
         $lastName = $parts[0]; // Nom de famille
-        $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
+        // $firstName = isset($parts[1]) ? trim($parts[1]) : ''; // Prénom
         $employeeData = [
             "matricule" => $employeeDataSlice[0],
-            "firstName" => $firstName,
+            "firstName" => $employeeDataSlice[1],
             "lastName" => $lastName,
             "bgLevel" => $employeeDataSlice[2],
             "grade" => $employeeDataSlice[3],
@@ -77,7 +77,7 @@ class AllocationService
             // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
             $employee->update([
                 // "matricule"=> $employeeData[0],
-                "firstName" => $firstName,
+                "firstName" => $employeeDataSlice[1],
                 "lastName" => $lastName,
                 // "password"=>"" ,
                 // "jobTitle"=> $employeeData[2] ,

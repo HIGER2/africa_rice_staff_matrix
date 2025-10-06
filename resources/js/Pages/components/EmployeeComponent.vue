@@ -47,8 +47,8 @@ import ImportFileComponent from './ImportFileComponent.vue'
     // { label: "Employee ID", key: "employeeId" },
     // { label: "Supervisor ID", key: "supervisorId" },
     { label: "RES Number", key: "resno" },
-    { label: "First Name", key: "name" },
-    { label: "Last Name", key: "lastName" },
+    { label: "Staff", key: "employee_name" },
+    // { label: "Last Name", key: "lastName" },
     { label: "Email", key: "email" },
     // { label: "Supervisor Matricule", key: "supervisors_matricule" },
     { label: "Supervisor Name", key: "supervisor_name" },
@@ -137,8 +137,8 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
 
 <template>
-    <div class="w-full h-screen  flex flex-col" >
-    <div class="w-full p-3">
+    <div class="w-full h-screen overflow-hidden  flex flex-col bg-white" >
+    <div class="w-full p-3 h-[100px]">
         <div class="flex p-4 rounded-lg mb-3 justify-between items-center z-30  top-0 sticky bg-white ">
             <h1 class="text-xl font-bold mb-4">Staff Activity Contribution (SAC)</h1>
             <div class="flex items-center gap-2 ">
@@ -160,106 +160,105 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
         </div>
     </div>
-        <div class="flex-1 p-3 ">
-                    
-            <div 
-            @scroll="onScroll"
-            class="w-full rounded-lg overflow-hidden bg-white border border-gray-200">
-               <div class=" overflow-x-auto overflow-y-auto min-h-10 max-h-[600px]">
-                   <table class="min-w-max   text-sm w-full border-collapse">
-                    <thead class=" bg-white z-20  sticky top-0 ">
-                    <tr>
-                        <th
-                        v-for="(item, key) in headers"
-                        :key="item.key"
-                        :class="item.key=='resno' && 'sticky left-0 border'
-                        "
-                        class="px-4 py-4 bg-white border text-[11px] border-gray-300 text-left whitespace-nowrap"
-                        >
-                        {{ item.label}}
-                        </th>
-                        <th class="sticky bg-white right-0 z-10">
-                            Action
-                        </th>
-                        <!-- <th
-                        v-for="(label, key) in headerMorth"
-                        :key="key"
-                        class="px-4 py-2 border text-[11px] border-gray-300 text-left whitespace-nowrap"
-                        >
-                        {{ label }}
-                        </th> -->
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <!-- <template v-for="(row, index) in staffData" :key="index">
-                            <template v-if=" row.timeAllocations.length > 0">
-                            <tr 
-                            v-for="(item, key) in row.timeAllocations"
-                                class="hover:bg-blue-50 cursor-pointer" @click="openModal(row)">
-                                <td
+    <div class="flex-1 p-3  ">
+                
+        <div 
+        @scroll="onScroll"
+        class="w-full rounded-lg h-full overflow-hidden   border border-gray-200">
+            <div class=" overflow-x-auto  overflow-y-auto min-h-10 max-h-[calc(100vh-120px)]">
+                <table class="min-w-max   text-sm w-full border-collapse">
+                <thead class=" bg-white z-20  sticky top-0 ">
+                <tr>
+                    <th
+                    v-for="(item, key) in headers"
+                    :key="item.key"
+                    :class="item.key=='resno' && 'sticky left-0 border'
+                    "
+                    class="px-4 py-4 bg-white border text-[11px] border-gray-300 text-left whitespace-nowrap"
+                    >
+                    {{ item.label}} 
+                    </th>
+                    <th class="sticky bg-white right-0 z-10">
+                        Action
+                    </th>
+                    <!-- <th
+                    v-for="(label, key) in headerMorth"
+                    :key="key"
+                    class="px-4 py-2 border text-[11px] border-gray-300 text-left whitespace-nowrap"
+                    >
+                    {{ label }}
+                    </th> -->
+                </tr>
+                </thead>
+                <tbody>
+                    <!-- <template v-for="(row, index) in staffData" :key="index">
+                        <template v-if=" row.timeAllocations.length > 0">
+                        <tr 
+                        v-for="(item, key) in row.timeAllocations"
+                            class="hover:bg-blue-50 cursor-pointer" @click="openModal(row)">
+                            <td
+                            class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap"
+                            v-for="(label, key) in headers"
+                            :key="key"
+                            >{{ row[key] }}
+                        </td>
+                        <td v-for="(month, mIndex) in headerMorth" :key="mIndex" class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap">
+                            {{ item[month.toLowerCase()] || 0 }}
+                        </td>
+                        </tr>
+                        </template>
+                        <tr 
+                        @click="openModal(row)"
+                        v-else>
+                            <td
                                 class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap"
                                 v-for="(label, key) in headers"
                                 :key="key"
                                 >{{ row[key] }}
                             </td>
                             <td v-for="(month, mIndex) in headerMorth" :key="mIndex" class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap">
-                                {{ item[month.toLowerCase()] || 0 }}
-                            </td>
-                            </tr>
-                            </template>
-                            <tr 
-                            @click="openModal(row)"
-                            v-else>
-                                <td
-                                    class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap"
-                                    v-for="(label, key) in headers"
-                                    :key="key"
-                                    >{{ row[key] }}
-                                </td>
-                                <td v-for="(month, mIndex) in headerMorth" :key="mIndex" class="px-4 py-2 border text-[11px] border-gray-300 whitespace-nowrap">
-                                    0
-                                </td>
-                            </tr>
-                        </template> -->
-                        <tr
-                            v-for="(row, index) in staffData"
-                            :key="index"
-                            class="hover:bg-blue-100 cursor-pointer"
-                            
-                        >
-                            <td
-                            v-for="(item, key) in headers"
-                            :key="item.key"
-                            :class="item.key=='resno' && 'sticky left-0 z-10'
-                            "
-                            class="px-4 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
-                            >
-                            {{row[item.key]}}
-                            </td>
-                            <td
-                            class="px-4 sticky right-0 z-10 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
-                            >
-                                <div class="flex items-center gap-2 px-2  ">
-                                    <button 
-                                    type="button"
-                                    @click="openModal(row)"
-                                    class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
-                                    <i class="uil uil-eye"></i>Activity</button>
-                                    <button 
-                                    @click="openEmployeeModal(row)"
-                                    type="button"
-                                    class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
-                                    <i class="uil uil-pen"></i>Edit
-                                </button>
-                                </div>
+                                0
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-               </div>
+                    </template> -->
+                    <tr
+                        v-for="(row, index) in staffData"
+                        :key="index"
+                        class="hover:bg-blue-100 cursor-pointer"
+                        
+                    >
+                        <td
+                        v-for="(item, key) in headers"
+                        :key="item.key"
+                        :class="item.key=='resno' && 'sticky left-0 z-10'
+                        "
+                        class="px-4 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                        >
+                        {{row[item.key]}}
+                        </td>
+                        <td
+                        class="px-4 sticky right-0 z-10 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                        >
+                            <div class="flex items-center gap-2 px-2  ">
+                                <button 
+                                type="button"
+                                @click="openModal(row)"
+                                class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
+                                <i class="uil uil-eye"></i>Activity</button>
+                                <button 
+                                @click="openEmployeeModal(row)"
+                                type="button"
+                                class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
+                                <i class="uil uil-pen"></i>Edit
+                            </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             </div>
         </div>
-
+    </div>
         <!-- Modal -->
             <AllocationConmponent 
             @update:selectedRow="handleUpdateSelectedRow"

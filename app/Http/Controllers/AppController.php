@@ -29,6 +29,7 @@ class AppController extends Controller
                 'employees.supervisorId',
                 'employees.matricule as resno',
                 'employees.firstName as name',
+                DB::raw("CONCAT(employees.firstName, ' ', employees.lastName) as employee_name"),
                 'employees.lastName as lastName',
                 'supervisors.matricule as supervisors_matricule',
                 DB::raw("CONCAT(supervisors.firstName, ' ', supervisors.lastName) as supervisor_name"),
