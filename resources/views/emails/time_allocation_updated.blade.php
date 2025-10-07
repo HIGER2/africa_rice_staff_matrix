@@ -1,6 +1,10 @@
-<h2>Hello  {{ $employee->lastName }} {{ $employee->name }},</h2>
-
-<p>Your Activity Contribution has been updated.</p>
+@if ($receiver)
+    <h2>Hello {{ $employee->lastName }} {{ $employee->name }},</h2>
+    <p>Your Activity Contribution has been updated.</p>
+@else
+    <h2>Hello {{ $employee->supervisor->lastName }} {{ $employee->supervisor->name }},</h2>
+    <p>The activity contribution of your staff <h2> {{ $employee->lastName }} {{ $employee->name }}</h2> has been updated.</p>
+@endif
 
 {{-- <h3>Année : {{ $timeAllocations[0]['Year'] ?? 'Non spécifiée' }}</h3> --}}
 {{-- 
@@ -104,4 +108,4 @@
 </table>
 
 
-<p style="margin-top: 20px;">Merci.</p>
+{{-- <p style="margin-top: 20px;">Merci.</p> --}}

@@ -451,18 +451,31 @@ class AppController extends Controller
                     // 'Date' => $allocation->date,
                 ];
             })->toArray();
-            $supervisorEmail = $employee->supervisor->email ?? null;
-            $mail = Mail::to($employee->email);
-            if ($supervisorEmail) {
-                $mail->cc($supervisorEmail);
-            }
 
-            if (empty($employee->email) || !filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
+            $supervisorEmail = $employee->supervisor->email ?? null;
+            $receiver = true;
+            // Priorité à l'email de l'employé, sinon email du superviseur
+            if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
+                $email = $employee->email;
+                $cc = $supervisorEmail; // le superviseur en cc
+            } elseif (!empty($supervisorEmail) && filter_var($supervisorEmail, FILTER_VALIDATE_EMAIL)) {
+
+                $email = $supervisorEmail;
+                $cc = null; // pas de cc si on utilise l'email du superviseur
+                $receiver = false;
+            } else {
                 return response()->json([
                     'message' => 'Invalid or missing email',
                 ], 422);
             }
-            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations));
+
+            // Préparer et envoyer l'email
+            $mail = Mail::to($email);
+            if ($cc) {
+                $mail->cc($cc);
+            }
+
+            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
             return response()->json(['message' => 'Email sent successfully', 'data' => $employee->timeAllocations]);
         } catch (\Throwable $th) {
             return response()->json([

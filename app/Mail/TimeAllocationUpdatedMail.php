@@ -16,13 +16,15 @@ class TimeAllocationUpdatedMail extends Mailable
     /**
      * Create a new message instance.
      */
-    
+
     public $employee;
     public $timeAllocations;
-    public function __construct($employee, $timeAllocations)
+    public $receiver;
+    public function __construct($employee, $timeAllocations, $receiver)
     {
         $this->employee = $employee;
         $this->timeAllocations = $timeAllocations;
+        $this->receiver = $receiver;
     }
 
     /**
@@ -38,12 +40,12 @@ class TimeAllocationUpdatedMail extends Mailable
     /**
      * Get the message content definition.
      */
-  public function content(): Content
-{
-    return new Content(
-        view: 'emails.time_allocation_updated',
-    );
-}
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.time_allocation_updated',
+        );
+    }
 
     /**
      * Get the attachments for the message.
