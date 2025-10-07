@@ -224,7 +224,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
                     <tr
                         v-for="(row, index) in staffData"
                         :key="index"
-                        class="hover:bg-blue-100 cursor-pointer"
+                        class="group  cursor-pointer"
                         
                     >
                         <td
@@ -232,14 +232,45 @@ import ImportFileComponent from './ImportFileComponent.vue'
                         :key="item.key"
                         :class="item.key=='resno' && 'sticky left-0 z-10'
                         "
-                        class="px-4 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                        class="px-4 border py-3 border-b group-hover:bg-gray-100 text-[12px] bg-white border-gray-200 whitespace-nowrap"
                         >
                         {{row[item.key]}}
                         </td>
                         <td
-                        class="px-4 sticky right-0 z-10 border py-3 border-b text-[12px] bg-white border-gray-200 whitespace-nowrap"
+                        class="px-4 sticky right-0 z-10 border py-3 border-b text-[12px] group-hover:bg-gray-100 bg-white border-gray-200 whitespace-nowrap"
                         >
-                            <div class="flex items-center gap-2 px-2  ">
+
+                        <div class="flex items-center gap-3 cursor-pointer">
+                            <!-- Bouton Activity -->
+                            <button
+                                type="button"
+                                @click="openModal(row)"
+                                class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-xl
+                                    bg-white text-gray-700 font-medium border border-gray-200
+                                    hover:bg-gray-50 hover:shadow-sm
+                                    active:scale-95 active:shadow-inner
+                                    transition-all duration-200"
+                            >
+                                <i class="uil uil-eye text-gray-500 text-lg"></i>
+                                Activity
+                            </button>
+
+                            <!-- Bouton Edit -->
+                            <button
+                                type="button"
+                                @click="openEmployeeModal(row)"
+                                class="flex items-center cursor-pointer gap-2 px-3 py-2 rounded-xl
+                                    bg-white text-gray-700 font-medium border border-gray-200
+                                    hover:bg-gray-50 hover:shadow-sm
+                                    active:scale-95 active:shadow-inner
+                                    transition-all duration-200"
+                            >
+                                <i class="uil uil-pen text-gray-500 text-lg"></i>
+                                Edit
+                            </button>
+                            </div>
+
+                            <!-- <div class="flex items-center gap-2 px-2  ">
                                 <button 
                                 type="button"
                                 @click="openModal(row)"
@@ -251,7 +282,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
                                 class="p-2 bg-slate-200 cursor-pointer text-slate-950 font-medium rounded-lg">
                                 <i class="uil uil-pen"></i>Edit
                             </button>
-                            </div>
+                            </div> -->
                         </td>
                     </tr>
                 </tbody>
