@@ -245,13 +245,13 @@ import ImportFileComponent from './ImportFileComponent.vue'
                             <button
                                 type="button"
                                 @click="openModal(row)"
-                                class="flex items-center gap-2 cursor-pointer px-4 py-1 rounded-xl
+                                class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg
                                     bg-white text-gray-700 font-medium border border-gray-200
                                     hover:bg-gray-50 hover:shadow-sm
                                     active:scale-95 active:shadow-inner
                                     transition-all duration-200"
                             >
-                                <i class="uil uil-eye text-gray-500 text-lg"></i>
+                                <i class="uil uil-eye text-gray-500 text-sm"></i>
                                 Activity
                             </button>
 
@@ -259,13 +259,13 @@ import ImportFileComponent from './ImportFileComponent.vue'
                             <button
                                 type="button"
                                 @click="openEmployeeModal(row)"
-                                class="flex items-center cursor-pointer gap-2 px-4 py-1 rounded-xl
+                                class="flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg
                                     bg-white text-gray-700 font-medium border border-gray-200
                                     hover:bg-gray-50 hover:shadow-sm
                                     active:scale-95 active:shadow-inner
                                     transition-all duration-200"
                             >
-                                <i class="uil uil-pen text-gray-500 text-lg"></i>
+                                <i class="uil uil-pen text-gray-500 text-sm"></i>
                                 Edit
                             </button>
                             </div>
