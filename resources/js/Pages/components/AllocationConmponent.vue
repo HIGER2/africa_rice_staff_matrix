@@ -255,7 +255,7 @@ const handleGetTimeAllocations = async (staffId: string) => {
         })
     }
 
-    function handleDeleteTimeAllocation(id,callback?: Function) {
+    function handleDeleteTimeAllocation(id,index,callback?: Function) {
         if (!confirm('Are you sure you want to delete these changes?')) {
             callback(true)
             return;
@@ -411,7 +411,7 @@ const getColorClass = (value: number, key: string): string => {
             v-for="(allocation, index) in localSelectedRow" :key="allocation.id || index"
             :allocation="allocation"
             @removeItem="removeItem(index)"
-            @delete="handleDeleteTimeAllocation(allocation.id,index)"
+             @delete="(finish) => handleDeleteTimeAllocation(allocation.id, index, finish)"
        />
       </div>
 

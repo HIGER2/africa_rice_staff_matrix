@@ -53,6 +53,11 @@ class AppController extends Controller
     public function updateEmployee(Request $request)
     {
 
+
+        if (Employee::where('email', $request['email'])->where('employeeId', '!=', $request['employeeId'])->exists()) {
+            return response()->json(['message' => 'This email address is already used by another staff.'], 422);
+        }
+
         // Récupérer l'employé via employeeId ou autre identifiant unique
         $employee = Employee::where('employeeId', $request['employeeId'])->first();
 
