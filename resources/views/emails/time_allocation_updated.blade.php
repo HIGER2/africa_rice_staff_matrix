@@ -1,11 +1,10 @@
 @if ($receiver)
-    <h2>Hello {{ $employee->lastName }} {{ $employee->name }},</h2>
-    <p>Your Activity Contribution has been updated.</p>
+    <h3>Hello {{ $employee->lastName }} {{ $employee->name }},</h3>
+    <p>Your <strong>{{ date('Y') }}</strong>  Activity Contribution  has been updated.</p>
 @else
     <h2>Hello {{ $employee->supervisor->lastName }} {{ $employee->supervisor->name }},</h2>
-    <p>The activity contribution of your staff <h2> {{ $employee->lastName }} {{ $employee->name }}</h2> has been updated.</p>
+    <p>The <strong>{{ date('Y') }}</strong> activity contribution   of your staff <strong>{{ $employee->lastName }} {{ $employee->name }}</strong> has been updated.</p>
 @endif
-
 {{-- <h3>Année : {{ $timeAllocations[0]['Year'] ?? 'Non spécifiée' }}</h3> --}}
 {{-- 
 @php
