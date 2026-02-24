@@ -49,11 +49,16 @@ interface SelectedRowData {
   monthlyTotal?: MonthlyTotal | null
 }
 
+
 // 2. Props avec validation et valeurs par défaut
 const props = defineProps<{
   selectedRow: SelectedRowData | null,
   staffId: string | null,
 }>()
+
+
+let selectYear = ref(new Date().getFullYear())
+let optionsYear = ref([])
 
 // 3. Émission d'événements typés
 const emit = defineEmits<{
@@ -138,9 +143,15 @@ const createInitialMonthlyTotal = (): MonthlyTotal => ({
 const handleGetTimeAllocations = async (staffId: string) => {
   if (staffId) {
     loading.value = true
-   window.axios.get('/staff/time-allocations/' + staffId)
+    let firstYear = selectYear.value || new Date().getFullYear()  
+   window.axios.get(`/staff/time-allocations/${staffId}/${firstYear}`)
     .then(response => {
-        const { time_allocations, ...employeeInfo } = response.data.data
+      optionsYear.value = response.data?.year || []
+
+      console.log('====================================');
+      console.log(response.data.data);
+      console.log('====================================');
+        const { time_allocations, ...employeeInfo} = response.data.data
         localSelectedRow.value = time_allocations;
         employee.value = employeeInfo
     })
@@ -153,7 +164,6 @@ const handleGetTimeAllocations = async (staffId: string) => {
     })
   }
 }
-
     // 8. Watchers pour réagir aux changements de props
     // watch(
     // () => props.selectedRow?.timeAllocations,
@@ -166,12 +176,15 @@ const handleGetTimeAllocations = async (staffId: string) => {
     // { deep: true }
     // )
 
-    watch(() => props.staffId, async (newId) => {
-    if (newId) {
-        handleGetTimeAllocations(newId)
+watch(
+  [() => props.staffId, () => selectYear.value],
+  async ([newStaffId, newYear]) => {
+    if (newStaffId) {
+      await handleGetTimeAllocations(newStaffId)
     }
-    }, { immediate: true })
-
+  },
+  { immediate: true }
+)
     // 9. Fonctions utilitaires
     const calculateRowTotal = (allocation: TimeAllocation): number => {
     return months.reduce((total, month) => {
@@ -214,7 +227,7 @@ const handleGetTimeAllocations = async (staffId: string) => {
     localSelectedRow.value.unshift(createInitialAllocation())
     
     if (localSelectedRow.value.length === 1) {
-        localSelectedRow.value.monthlyTotal = createInitialMonthlyTotal()
+        // localSelectedRow.value.monthlyTotal = createInitialMonthlyTotal()
     }
     }
 
@@ -232,15 +245,14 @@ const handleGetTimeAllocations = async (staffId: string) => {
         }
         if (!confirm('Are you sure you want to save these changes?')) {
             callback(true)
-
             return false;
         }
-        let items = {...localSelectedRow.value}  
-        
+        let items =[...localSelectedRow.value] 
+
         window.axios.post('/time-allocations', {
             employeeId: employee.value.employeeId,
             timeAllocations: items,
-            monthlyTimeTotal : items.monthlyTotal
+            // monthlyTimeTotal : items.monthlyTotal
         })
         .then(async(response) => {
             await handleGetTimeAllocations(employee.value.employeeId)
@@ -343,7 +355,6 @@ const getColorClass = (value: number, key: string): string => {
     
     <div  class="bg-white flex flex-col w-[100%] p-3 px-5 rounded-xl shadow-xl overflow-hidden max-h-[90vh]">
       <!-- Header -->
-       <!-- <pre>{{ selectedRow }}</pre> -->
         <template v-if="loading">
             <div class="w-full py-10 text-center text-lg font-bold">
                 Loading...
@@ -360,7 +371,10 @@ const getColorClass = (value: number, key: string): string => {
             Supervisor: <span class="capitalize text-gray-600">{{ selectedRow?.supervisor_name }}</span>
           </h2>
           <h2 class="font-semibold mb-4 uppercase">
-            Year: <span class="capitalize text-gray-600">{{ new Date().getFullYear() }}</span>
+            <!-- {{ optionsYear }} -->
+            Year: <select v-model="selectYear" class="border border-gray-300 rounded p-1">
+              <option v-for="year in optionsYear" :key="year" :value="year">{{ year }}</option>
+            </select>
           </h2>
         </div>
 

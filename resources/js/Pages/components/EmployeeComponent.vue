@@ -14,6 +14,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
     })
     let staffData = ref([])
     const loadingImport = ref(false)
+    let emailLoading = ref(false)
     const originalStaffData = ref([])
     const isModalVisible = ref(false)
     const selectedEmployee = ref({})
@@ -85,8 +86,6 @@ import ImportFileComponent from './ImportFileComponent.vue'
         selectedRow.value = null
         
     }
-
-
     watch(search, (value) => {
         const lowerVal = value.toLowerCase()
         staffData.value = props.staff.filter(item =>
@@ -128,6 +127,24 @@ import ImportFileComponent from './ImportFileComponent.vue'
     }
 
     
+    function handleSendEmail() {
+
+        if (!confirm('Do you really want to send this email?')) {
+            return;
+        }
+        emailLoading.value = true
+        axios.post('/send-mail/all')
+        .then(response => {
+            alert(response?.data?.message || 'Email sent successfully!')
+        })
+        .catch(error => {
+            // alert(error?.response.data?.message || error?.message)
+        })
+        .finally(() => {
+            emailLoading.value = false
+        })
+    }
+    
     onMounted(()=>{
 
     })
@@ -151,10 +168,25 @@ import ImportFileComponent from './ImportFileComponent.vue'
                     :disabled="loadingImport"
                     @click="handleImport"
                     type="button" 
-                    class="p-2  disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400">
+                    class="btn rounded-lg">
                     <i class="uil uil-export"></i> 
                     <span v-if="!loadingImport">Export</span>
                     <span v-else>Loading...</span>
+                    </button>
+
+                    <button 
+                    :disabled="emailLoading"
+                    @click="handleSendEmail"
+                    type="button" 
+                    class="
+                    p-2  disabled:bg-blue-400 disabled:cursor-not-allowed px-3  flex items-center gap-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400
+                    ">
+                    <span v-if="!emailLoading">
+                        Send mail to all
+                    </span>
+                    <span v-else>
+                        Senting...
+                    </span>
                     </button>
                 </div>
 
@@ -291,6 +323,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
         </div>
     </div>
         <!-- Modal -->
+         <template v-if="selectedRow">
             <AllocationConmponent 
             @update:selectedRow="handleUpdateSelectedRow"
             @close="closeModal"
@@ -299,6 +332,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
             :selectedRow="selectedRow"
             :staffId="selectedRow?.employeeId"
             />
+         </template>
             <EditEmployeeComponent
             :is-visible="isModalVisible"
             :employee-data="selectedEmployee"

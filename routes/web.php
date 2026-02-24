@@ -13,5 +13,6 @@ Route::post('/allocations-file', [AppController::class, 'uploadAllocation']);
 Route::post('/staff/update', [AppController::class, 'updateEmployee']);
 Route::get('/time-import', [AppController::class, 'importAllocation']);
 Route::post('/time-delete', [AppController::class, 'deleteTimeAllocation']);
-Route::get('/staff/time-allocations/{id}', [AppController::class, 'StaffTimeAllocations']);
+Route::get('/staff/time-allocations/{id}/{year?}', [AppController::class, 'StaffTimeAllocations']);
 Route::post('/send-mail', [AppController::class, 'sendMail']);
+Route::post('/send-mail/all', [AppController::class, 'sendMailAll']);

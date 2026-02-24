@@ -105,6 +105,7 @@ class AppController extends Controller
             ->where('employees.firstName', '!=', 'admin')
             ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->leftJoin('time_allocations', 'employees.employeeId', '=', 'time_allocations.employeeId')
+            ->whereYear('time_allocations.date', Carbon::now()->year) // Filtrer les allocations de l'année en cours
             ->select(
                 // 'employees.employeeId',
                 // 'employees.email',
@@ -145,12 +146,12 @@ class AppController extends Controller
     {
         $allocations = $request->timeAllocations;
         $employeeId = $request->employeeId;
-        $monthlyTotal = $request->monthlyTimeTotal;
+        // $monthlyTotal = $request->monthlyTimeTotal;
         $year = Carbon::now()->year;
-
         // return response()->json(['message' => $employeeId]);
 
         // $employee = Employee::where('employeeId', $employeeId)->first();
+
         $employee = Employee::where('employeeId', $employeeId)->first();
 
         if (!$employee) {
@@ -158,9 +159,14 @@ class AppController extends Controller
         }
 
         foreach ($allocations as $value) {
-            $value['year'] = date('Y');
+            $value['year'] = $year;
             $value['employeeId'] = $employeeId;
             $employee->timeAllocations()->updateOrCreate(
+                [
+                    'id' => $value['id'] ?? null,
+                    'employeeId' => $employeeId,
+                    'year' => $year
+                ],
                 [
                     'id' => $value['id'] ?? null,
                     'employeeId' => $employeeId,
@@ -476,6 +482,7 @@ class AppController extends Controller
             }
 
             $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+
             return response()->json(['message' => 'Email sent successfully', 'data' => $employee->timeAllocations]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -484,8 +491,93 @@ class AppController extends Controller
         }
     }
 
-    public function StaffTimeAllocations($id)
+        public function sendMailAll()
+        {
+            try {
+                $currentYear = Carbon::now()->year;
+
+                Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
+                        $query->whereYear('date', $currentYear);
+                    })
+                ->with([
+                    'timeAllocations' => function ($query) use ($currentYear) {
+                        $query->orderBy('created_at', 'desc');
+                        $query->whereYear('date', $currentYear);
+                    },
+                    'monthlyTotal' => function ($query) use ($currentYear) {
+                        $query->whereYear('date', $currentYear);
+                    },
+                    'supervisor'
+                ])
+                ->chunk(50, function ($employees) {
+
+                    foreach ($employees as $employee) {
+
+                        if ($employee->timeAllocations->isEmpty()) {
+                            continue;
+                        }
+
+                        $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
+                            return [
+                                'Agreement' => $allocation->agreement,
+                                'Bus' => $allocation->bus,
+                                'Jan' => $allocation->jan,
+                                'Feb' => $allocation->feb,
+                                'Mar' => $allocation->mar,
+                                'Apr' => $allocation->apr,
+                                'May' => $allocation->may,
+                                'Jun' => $allocation->jun,
+                                'Jul' => $allocation->jul,
+                                'Aug' => $allocation->aug,
+                                'Sep' => $allocation->sep,
+                                'Oct' => $allocation->oct,
+                                'Nov' => $allocation->nov,
+                                'Dec' => $allocation->dec,
+                                'Total' => $allocation->total,
+                            ];
+                        })->toArray();
+
+                        $supervisorEmail = $employee->supervisor->email ?? null;
+
+                        if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
+                            $email = $employee->email;
+                            $cc = $supervisorEmail;
+                            $receiver = true;
+                        } elseif (!empty($supervisorEmail) && filter_var($supervisorEmail, FILTER_VALIDATE_EMAIL)) {
+                            $email = $supervisorEmail;
+                            $cc = null;
+                            $receiver = false;
+                        } else {
+                            continue;
+                        }
+
+                        $mail = Mail::to($email);
+
+                        if ($cc) {
+                            $mail->cc($cc);
+                        }
+
+                        $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+                    }
+                });
+
+                return response()->json(['message' => 'Emails sent successfully']);
+
+            } catch (\Throwable $th) {
+
+                return response()->json([
+                    'message' => 'Error sending emails',
+                ], 500);
+            }
+        }
+
+    public function StaffTimeAllocations($id,$year = null)
     {
+        $startYear = 2025;
+        $currentYear = now()->year;
+        $years = range($currentYear,$startYear);
+        $firstYear = $year ?? $currentYear;
+
         $employee = Employee::select(
             'employeeId',
             'email',
@@ -504,7 +596,7 @@ class AppController extends Controller
         )
             ->with(
                 [
-                    'timeAllocations' => function ($query) {
+                    'timeAllocations' => function ($query) use ($firstYear) {
                         $query->select(
                             'id',
                             'employeeId',
@@ -524,7 +616,9 @@ class AppController extends Controller
                             'dec',
                             'date',
                             'total'
-                        )->orderBy('created_at', 'desc');
+                        )->orderBy('created_at', 'desc')
+                        ->whereYear('date', $firstYear)
+                        ;
                     },
                     // 'monthlyTotal' => function ($query) {
                     //         $query->select(
@@ -556,7 +650,9 @@ class AppController extends Controller
             return response()->json(['message' => 'Employee not found'], 404);
         }
 
-        return response()->json(['data' => $employee]);
+        return response()->json([
+        'year' => $years,   
+        'data' => $employee]);
     }
 
 
