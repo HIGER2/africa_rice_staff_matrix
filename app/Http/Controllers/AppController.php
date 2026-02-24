@@ -491,85 +491,85 @@ class AppController extends Controller
         }
     }
 
-        public function sendMailAll()
-        {
-            try {
-                $currentYear = Carbon::now()->year;
+    public function sendMailAll()
+    {
+        try {
+            $currentYear = Carbon::now()->year;
 
-                Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
-                        $query->whereYear('date', $currentYear);
-                    })
-                ->with([
-                    'timeAllocations' => function ($query) use ($currentYear) {
-                        $query->orderBy('created_at', 'desc');
-                        $query->whereYear('date', $currentYear);
-                    },
-                    'monthlyTotal' => function ($query) use ($currentYear) {
-                        $query->whereYear('date', $currentYear);
-                    },
-                    'supervisor'
-                ])
-                ->chunk(50, function ($employees) {
+            Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
+                    $query->whereYear('date', $currentYear);
+                })
+            ->with([
+                'timeAllocations' => function ($query) use ($currentYear) {
+                    $query->orderBy('created_at', 'desc');
+                    $query->whereYear('date', $currentYear);
+                },
+                'monthlyTotal' => function ($query) use ($currentYear) {
+                    $query->whereYear('date', $currentYear);
+                },
+                'supervisor'
+            ])
+            ->chunk(50, function ($employees) {
 
-                    foreach ($employees as $employee) {
+                foreach ($employees as $employee) {
 
-                        if ($employee->timeAllocations->isEmpty()) {
-                            continue;
-                        }
-
-                        $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
-                            return [
-                                'Agreement' => $allocation->agreement,
-                                'Bus' => $allocation->bus,
-                                'Jan' => $allocation->jan,
-                                'Feb' => $allocation->feb,
-                                'Mar' => $allocation->mar,
-                                'Apr' => $allocation->apr,
-                                'May' => $allocation->may,
-                                'Jun' => $allocation->jun,
-                                'Jul' => $allocation->jul,
-                                'Aug' => $allocation->aug,
-                                'Sep' => $allocation->sep,
-                                'Oct' => $allocation->oct,
-                                'Nov' => $allocation->nov,
-                                'Dec' => $allocation->dec,
-                                'Total' => $allocation->total,
-                            ];
-                        })->toArray();
-
-                        $supervisorEmail = $employee->supervisor->email ?? null;
-
-                        if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
-                            $email = $employee->email;
-                            $cc = $supervisorEmail;
-                            $receiver = true;
-                        } elseif (!empty($supervisorEmail) && filter_var($supervisorEmail, FILTER_VALIDATE_EMAIL)) {
-                            $email = $supervisorEmail;
-                            $cc = null;
-                            $receiver = false;
-                        } else {
-                            continue;
-                        }
-
-                        $mail = Mail::to($email);
-
-                        if ($cc) {
-                            $mail->cc($cc);
-                        }
-
-                        $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+                    if ($employee->timeAllocations->isEmpty()) {
+                        continue;
                     }
-                });
 
-                return response()->json(['message' => 'Emails sent successfully']);
+                    $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
+                        return [
+                            'Agreement' => $allocation->agreement,
+                            'Bus' => $allocation->bus,
+                            'Jan' => $allocation->jan,
+                            'Feb' => $allocation->feb,
+                            'Mar' => $allocation->mar,
+                            'Apr' => $allocation->apr,
+                            'May' => $allocation->may,
+                            'Jun' => $allocation->jun,
+                            'Jul' => $allocation->jul,
+                            'Aug' => $allocation->aug,
+                            'Sep' => $allocation->sep,
+                            'Oct' => $allocation->oct,
+                            'Nov' => $allocation->nov,
+                            'Dec' => $allocation->dec,
+                            'Total' => $allocation->total,
+                        ];
+                    })->toArray();
 
-            } catch (\Throwable $th) {
+                    $supervisorEmail = $employee->supervisor->email ?? null;
 
-                return response()->json([
-                    'message' => 'Error sending emails',
-                ], 500);
-            }
+                    if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
+                        $email = $employee->email;
+                        $cc = $supervisorEmail;
+                        $receiver = true;
+                    } elseif (!empty($supervisorEmail) && filter_var($supervisorEmail, FILTER_VALIDATE_EMAIL)) {
+                        $email = $supervisorEmail;
+                        $cc = null;
+                        $receiver = false;
+                    } else {
+                        continue;
+                    }
+
+                    $mail = Mail::to($email);
+
+                    if ($cc) {
+                        $mail->cc($cc);
+                    }
+
+                    $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+                }
+            });
+
+            return response()->json(['message' => 'Emails sent successfully']);
+
+        } catch (\Throwable $th) {
+
+            return response()->json([
+                'message' => 'Error sending emails',
+            ], 500);
         }
+    }
 
     public function StaffTimeAllocations($id,$year = null)
     {

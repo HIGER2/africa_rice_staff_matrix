@@ -57,15 +57,18 @@ class AllocationService
         ];
 
         $supervisorMatricule = $employeeDataSlice[10];
-
+        
         for ($i = 14; $i <= 26; $i++) {
             // Si la valeur est une chaîne, on la convertit en int
             if (isset($data[$i])) {
                 $data[$i] = (int) $data[$i];
             }
         }
+
         $employee = Employee::where('matricule', $employeeData['matricule'])->first();
+
         $supervisor = Employee::where('matricule', $supervisorMatricule)->first();
+
 
         if ($supervisor) {
             $employeeData['supervisorId'] = $supervisor->employeeId;
@@ -73,6 +76,7 @@ class AllocationService
         if (!$employee) {
             // Si n’existe pas, créer
             $employee = Employee::create($employeeData);
+
         } else {
             // S’il existe, mettre à jour seulement certains champs (exemple : 'name' et 'email')
             $employee->update([
@@ -87,7 +91,7 @@ class AllocationService
                 "country_of_residence" => $employeeData['country_of_residence'],
                 "base_station" => $employeeData['base_station'],
                 "division" => $employeeData['division'],
-                "phone2" => $employeeData['division'],
+                "phone2" => $employeeData['phone2'],
                 "unit_program" => $employeeData['unit_program'],
                 "jobTitle" => $employeeData['jobTitle'],
                 // "email"=>$employeeData[0]
@@ -98,7 +102,9 @@ class AllocationService
             $new[] = $employee;
         }
 
+
         if ($employee) {
+
             $agreement = $data[11] ?? null;
             $bus = $data[12] ?? null;
             $payload = [
@@ -120,6 +126,7 @@ class AllocationService
                 'dec' => helpers::normalizeNumber($data[24]),
                 'total' => helpers::normalizeNumber($data[25]),
             ];
+
             // ✅ Vérifie si ce TimeAllocation existe déjà
             $alreadyExists = $employee->timeAllocations()->updateOrCreate(
                 [
@@ -171,7 +178,6 @@ class AllocationService
     public function SaveAllocation($filePath)
     {
         $data = helpers::extractDataXlsx($filePath);
-
         foreach ($data as $key => $row) {
             if ($key == 0) continue;
             self::timeAllocation($row);

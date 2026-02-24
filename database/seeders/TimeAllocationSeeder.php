@@ -22,7 +22,7 @@ class TimeAllocationSeeder extends Seeder
 
     public function run(): void
     {
-        $filePath = public_path('new.xlsx');
+        $filePath = public_path('template.xlsx');
         $this->allocationService->SaveAllocation($filePath);
     }
 }
