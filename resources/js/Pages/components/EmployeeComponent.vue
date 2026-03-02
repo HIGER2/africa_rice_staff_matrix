@@ -90,8 +90,8 @@ import ImportFileComponent from './ImportFileComponent.vue'
         const lowerVal = value.toLowerCase()
         staffData.value = props.staff.filter(item =>
             item?.name.toLowerCase().includes(lowerVal) ||
-            item?.lastName.toLowerCase().includes(lowerVal) 
-            // item?.resno.toLowerCase().includes(lowerVal)
+            item?.lastName.toLowerCase().includes(lowerVal) ||
+            item?.resno.toLowerCase().includes(lowerVal)
         )
     })
     
@@ -102,9 +102,9 @@ import ImportFileComponent from './ImportFileComponent.vue'
     },
     { deep: true, immediate: true }
     )
-    const handleImport =async () => {
+    const handleExport =async () => {
         loadingImport.value = true
-            axios.get('/time-import')
+            axios.get('/time-export')
             .then(response => {
                 console.log(response.data.data[10]) // Ici tu récupères tes données
                 const ws = XLSX.utils.json_to_sheet(response.data.data)
@@ -166,7 +166,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
                     <ImportFileComponent/>
                     <button 
                     :disabled="loadingImport"
-                    @click="handleImport"
+                    @click="handleExport"
                     type="button" 
                     class="btn rounded-lg">
                     <i class="uil uil-export"></i> 

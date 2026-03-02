@@ -99,7 +99,7 @@ class AppController extends Controller
         ], 200);
     }
 
-    public function importAllocation()
+    public function exportAllocation()
     {
         $employees = DB::table('employees')
             ->where('employees.firstName', '!=', 'admin')
@@ -659,7 +659,7 @@ class AppController extends Controller
     public function uploadAllocation(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:2048', // max 2MB
+        'file' => 'required|file|mimes:xlsx,xls|max:2048',
         ]);
 
         return $this->allocationService->uploadAllocation($request);

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\helpers;
 use App\Models\Employee;
 use App\Models\TimeAllocation;
+use Illuminate\Support\Facades\DB;
 
 class AllocationService
 {
@@ -18,12 +19,19 @@ class AllocationService
     public  function uploadAllocation($request)
     {
         try {
+            // DB::beginTransaction();
             $uploadedFile = $request->file('file');
-            $this->SaveAllocation($uploadedFile->getRealPath());
+
+            $employees = $this->SaveAllocation($uploadedFile->getRealPath());
+
+            // DB::commit();
             return response()->json([
                 'message' => 'Fichier uploadé avec succès',
+                "data" => $employees
             ]);
+
         } catch (\Throwable $th) {
+            // DB::rollBack();
             return response()->json([
                 'message' => "Une erreur s'est produite",
                 "error" => $th->getMessage()
@@ -55,9 +63,6 @@ class AllocationService
             "password" => "",
             "email" => $employeeDataSlice[0]
         ];
-
-        $supervisorMatricule = $employeeDataSlice[10];
-        
         for ($i = 14; $i <= 26; $i++) {
             // Si la valeur est une chaîne, on la convertit en int
             if (isset($data[$i])) {
@@ -67,12 +72,6 @@ class AllocationService
 
         $employee = Employee::where('matricule', $employeeData['matricule'])->first();
 
-        $supervisor = Employee::where('matricule', $supervisorMatricule)->first();
-
-
-        if ($supervisor) {
-            $employeeData['supervisorId'] = $supervisor->employeeId;
-        }
         if (!$employee) {
             // Si n’existe pas, créer
             $employee = Employee::create($employeeData);
@@ -102,9 +101,7 @@ class AllocationService
             $new[] = $employee;
         }
 
-
         if ($employee) {
-
             $agreement = $data[11] ?? null;
             $bus = $data[12] ?? null;
             $payload = [
@@ -175,12 +172,54 @@ class AllocationService
         }
     }
 
+    public function assignSupervisorAfterImport($row)
+    {
+        $employeeDataSlice = array_slice($row, 0, 11);
+        $employeeResno = $employeeDataSlice[0];
+        $supervisorMatricule = $employeeDataSlice[10];
+
+        $supervisor = Employee::where('matricule', $supervisorMatricule)->first();
+        $employee = Employee::where('matricule', $employeeResno)->first();
+
+        if ($supervisor && $employee) {
+            $employee['supervisorId'] = $supervisor['employeeId'];
+            $employee->save();
+            return;
+        }
+
+        return[
+            "employee" => $employee['firstName'] ?? null,
+            "employeeId" => $employee['employeeId'] ?? null,
+            "employeeResno" => $employee['matricule'] ?? null,
+            "supervisor" => $supervisor['firstName'] ?? null,
+            "supervisorId" => $supervisor['employeeId'] ?? null,
+            "supervisorResno" => $supervisor['matricule'] ?? null
+        ];
+    }
+
     public function SaveAllocation($filePath)
     {
         $data = helpers::extractDataXlsx($filePath);
+        $empyeEmployee = [];
+
+        // collect($data)->chunk(100)->each(function ($row, $key) {
+        //     if ($key == 0) return;
+        //     self::timeAllocation($row);
+        // });
+
+        // // return count($data);
+
         foreach ($data as $key => $row) {
             if ($key == 0) continue;
             self::timeAllocation($row);
         }
+        sleep(1);
+
+        foreach ($data as $key => $row) {
+            if ($key == 0) continue;
+            $empyeEmployee[] =  self::assignSupervisorAfterImport($row);
+        }
+
+        return $empyeEmployee;
     }
 }
