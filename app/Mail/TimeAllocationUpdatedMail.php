@@ -20,11 +20,13 @@ class TimeAllocationUpdatedMail extends Mailable
     public $employee;
     public $timeAllocations;
     public $receiver;
-    public function __construct($employee, $timeAllocations, $receiver)
+    public $currentYear;
+    public function __construct($employee, $timeAllocations, $receiver,$currentYear)
     {
         $this->employee = $employee;
         $this->timeAllocations = $timeAllocations;
         $this->receiver = $receiver;
+        $this->currentYear = $currentYear;
     }
 
     /**

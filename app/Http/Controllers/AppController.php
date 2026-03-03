@@ -398,6 +398,7 @@ class AppController extends Controller
     {
         try {
             $employeeId = $request->employeeId;
+            $currentYear = $request->query('year') ?? Carbon::now()->year;
             // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
             $employee = Employee::select(
                 'employeeId',
@@ -412,8 +413,9 @@ class AppController extends Controller
                 'jobTitle as position'
             )
                 ->with([
-                    'timeAllocations' => function ($query) {
-                        $query->select(
+                    'timeAllocations' => function ($query) use ($currentYear) {
+                        $query->whereYear('date', $currentYear)
+                        ->select(
                             'id',
                             'employeeId',
                             'agreement',
@@ -434,8 +436,9 @@ class AppController extends Controller
                             'total'
                         )->orderBy('created_at', 'desc');
                     },
-                    'monthlyTotal' => function ($query) {
-                        $query->select(
+                    'monthlyTotal' => function ($query) use ($currentYear) {
+                        $query->whereYear('date', $currentYear)
+                        ->select(
                             'id',
                             'employeeId', // pour la relation timeAllocations
                             'jan',
@@ -452,12 +455,12 @@ class AppController extends Controller
                             'dec',
                             'date',
                             'total'
-                        )
-                            ->whereYear('date', Carbon::now()->year);
+                        );
                     }
                 ])
                 ->where('employeeId', $employeeId)
                 ->first();
+
             if ($employee->timeAllocations->isEmpty()) {
                 return response()->json(['message' => 'Email not send allocations empty']);
             }
@@ -506,7 +509,7 @@ class AppController extends Controller
                 $mail->cc($cc);
             }
 
-            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+            $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver,$currentYear));
 
             return response()->json(['message' => 'Email sent successfully', 'data' => $employee->timeAllocations]);
         } catch (\Throwable $th) {
@@ -516,32 +519,29 @@ class AppController extends Controller
         }
     }
 
-    public function sendMailAll()
+    public function sendMailAll(Request $request)
     {
         try {
-            $currentYear = Carbon::now()->year;
+            $currentYear = $request->query('year') ?? Carbon::now()->year;
 
-            Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
-                    $query->whereYear('date', $currentYear);
+            $employees = Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
+                    $query->where('year', $currentYear);
                 })
             ->with([
                 'timeAllocations' => function ($query) use ($currentYear) {
-                    $query->orderBy('created_at', 'desc');
-                    $query->whereYear('date', $currentYear);
+                    $query->orderBy('created_at', 'desc')
+                    ->where('year', $currentYear);
                 },
                 'monthlyTotal' => function ($query) use ($currentYear) {
-                    $query->whereYear('date', $currentYear);
+                    $query->where('year', $currentYear);
                 },
                 'supervisor'
             ])
-            ->chunk(50, function ($employees) {
-
+            ->chunk(50, function ($employees) use ($currentYear) {
                 foreach ($employees as $employee) {
-
                     if ($employee->timeAllocations->isEmpty()) {
                         continue;
                     }
-
                     $timeAllocations = $employee->timeAllocations->map(function ($allocation) {
                         return [
                             'Agreement' => $allocation->agreement,
@@ -581,8 +581,7 @@ class AppController extends Controller
                     if ($cc) {
                         $mail->cc($cc);
                     }
-
-                    $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver));
+                    $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver,$currentYear));
                 }
             });
 

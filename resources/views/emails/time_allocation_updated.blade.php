@@ -1,6 +1,6 @@
 @if ($receiver)
-    <h3>Hello {{ $employee->lastName }} {{ $employee->name }},</h3>
-    <p>Your <strong>{{ date('Y') }}</strong>  Activity Contribution  has been updated.</p>
+    <h3>Hello  {{ $employee->name }},</h3>
+    <p>Your <strong>{{ $currentYear }}</strong>  Activity Contribution  has been updated.</p>
 @else
     <h2>Hello {{ $employee->supervisor->lastName }} {{ $employee->supervisor->name }},</h2>
     <p>The <strong>{{ date('Y') }}</strong> activity contribution   of your staff <strong>{{ $employee->lastName }} {{ $employee->name }}</strong> has been updated.</p>

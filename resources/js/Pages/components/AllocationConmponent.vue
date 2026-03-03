@@ -309,7 +309,7 @@ watch(
             callback(true)
             return;
         }
-        axios.post('/send-mail', {
+        axios.post(`/send-mail?year=${selectYear.value}`, {
             employeeId: employee.value.employeeId,
         })
         .then(response => {

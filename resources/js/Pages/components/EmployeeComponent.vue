@@ -129,12 +129,11 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
     
     function handleSendEmail() {
-
         if (!confirm('Do you really want to send this email?')) {
             return;
         }
         emailLoading.value = true
-        axios.post('/send-mail/all')
+        axios.post(`/send-mail/all?year=`, {})
         .then(response => {
             alert(response?.data?.message || 'Email sent successfully!')
         })
@@ -356,7 +355,6 @@ import ImportFileComponent from './ImportFileComponent.vue'
             @update:selectedRow="handleUpdateSelectedRow"
             @close="closeModal"
             @save="handleSaveTimeAllocations"
-            @sendEmail="handleSendEmail"
             :selectedRow="selectedRow"
             :staffId="selectedRow?.employeeId"
             />
