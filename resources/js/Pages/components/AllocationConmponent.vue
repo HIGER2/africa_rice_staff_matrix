@@ -396,7 +396,6 @@ const getColorClass = (value: number, key: string): string => {
               <div class="w-full flex items-center justify-center gap-1 text-[11px]"  
                 v-for="(label, key) in headerConfig" :key="key">
                 <span class="font-bold">{{ getLabelText(label, key) }}</span>
-                                   
                 <transition name="fade-slide" mode="out-in">
                   <span :class="[getColorClass(calculateTotalMonth(localSelectedRow, key), key), 'px-1 font-medium']"
                         :key="`${key}`">

@@ -18,9 +18,9 @@ class AppController extends Controller
 
     function __construct(protected AllocationService $allocationService) {}
 
-    public function index(): Response
+    public function index($search = null,$year = null): Response
     {
-
+        $year = $year ?? Carbon::now()->year;
         $employees = DB::table('employees')
             ->leftJoin('employees as supervisors', 'employees.supervisorId', '=', 'supervisors.employeeId')
             ->select(
@@ -45,8 +45,33 @@ class AppController extends Controller
             ->where('employees.firstName', '!=', 'admin')
             ->get();
 
+            $statistics = [
+                [
+                    'name' => 'Total Staff',
+                    'value' => $employees->count(),
+                ],
+                [
+                    'name' => 'Total Activity',
+                    'value' => DB::table('time_allocations')->where('year',$year)->count(),
+                    'year' => $year,
+                ],
+                [
+                    'name' => 'Total Activity Completed',
+                    'value' => DB::table('time_allocations')->where('total', '1200')->where('year',$year)->count(),
+                    'year' => $year,
+                    // 'value' => DB::table('time_allocations')->where('total', '1200')->sum('total_hours'),
+                ],
+                [
+                    'name' => 'Total Activity inCompleted',
+                    'value' => DB::table('time_allocations')->where('total','<', '1200')->where('year',$year)->count(),
+                    'year' => $year,
+                ],
+                
+            ];
+
         return Inertia::render('Home', [
-            'staff' => $employees
+            'staff' => $employees,
+            'statistics' => $statistics
         ]);
     }
 
@@ -661,7 +686,6 @@ class AppController extends Controller
         $request->validate([
         'file' => 'required|file|mimes:xlsx,xls|max:2048',
         ]);
-
         return $this->allocationService->uploadAllocation($request);
     }
 }

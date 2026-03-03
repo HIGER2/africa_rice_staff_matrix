@@ -11,6 +11,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
     const props = defineProps({
     staff: Array,
+    statistics: Array
     })
     let staffData = ref([])
     const loadingImport = ref(false)
@@ -90,8 +91,8 @@ import ImportFileComponent from './ImportFileComponent.vue'
         const lowerVal = value.toLowerCase()
         staffData.value = props.staff.filter(item =>
             item?.name.toLowerCase().includes(lowerVal) ||
-            item?.lastName.toLowerCase().includes(lowerVal) ||
-            item?.resno.toLowerCase().includes(lowerVal)
+            item?.lastName.toLowerCase().includes(lowerVal) 
+            // item?.resno.toLowerCase().includes(lowerVal)
         )
     })
     
@@ -108,7 +109,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
             .then(response => {
                 console.log(response.data.data[10]) // Ici tu récupères tes données
                 const ws = XLSX.utils.json_to_sheet(response.data.data)
-                                // Créer un classeur et y ajouter la feuille
+                    // Créer un classeur et y ajouter la feuille
                     const wb = XLSX.utils.book_new()
                     XLSX.utils.book_append_sheet(wb, ws, "Employees") 
                     // Exporter en fichier Excel
@@ -154,7 +155,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
 
 <template>
-    <div class="w-full h-screen overflow-hidden  flex flex-col bg-white" >
+    <div class="w-full mx-auto h-screen overflow-hidden  flex flex-col bg-white" >
     <div class="w-full p-3 h-[100px]">
         <div class="flex p-4 rounded-lg mb-3 justify-between items-center z-30  top-0 sticky bg-white ">
             <h1 class="text-xl font-bold mb-4">Staff Activity Contribution (SAC)</h1>
@@ -192,8 +193,35 @@ import ImportFileComponent from './ImportFileComponent.vue'
 
         </div>
     </div>
+        <!-- <div class="w-full grid p-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div
+        v-for="{name,value,year}, index in statistics"
+        class="bg-white rounded-2xl shadow-xs p-5 border border-gray-200">
+          <p class="text-sm text-gray-600 fond-semibold">{{ name }}</p>
+          <h2 class="text-2xl font-bold mt-2 text-blue-600">{{ value }}</h2>
+          <p class="text-xs text-green-500 mt-1" v-if="year">year : 2026</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xs p-5 border border-gray-200">
+          <p class="text-sm text-gray-500">Contrats Actifs</p>
+          <h2 class="text-2xl font-bold mt-2 text-indigo-600">324</h2>
+          <p class="text-xs text-gray-400 mt-1">78% du total</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xs p-5 border border-gray-200">
+          <p class="text-sm text-gray-500">Nouveaux ce mois</p>
+          <h2 class="text-2xl font-bold mt-2 text-emerald-600">24</h2>
+          <p class="text-xs text-green-500 mt-1">+8% vs mois dernier</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xs p-5 border border-gray-200">
+          <p class="text-sm text-gray-500">En attente</p>
+          <h2 class="text-2xl font-bold mt-2 text-orange-500">9</h2>
+          <p class="text-xs text-red-500 mt-1">2 urgents</p>
+        </div>
+
+        </div> -->
     <div class="flex-1 p-3  ">
-                
         <div 
         @scroll="onScroll"
         class="w-full rounded-lg h-full overflow-hidden   border border-gray-200">

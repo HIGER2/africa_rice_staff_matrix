@@ -3,12 +3,12 @@ import EmployeeComponent from './components/EmployeeComponent.vue';
 
 const props = defineProps({
   staff: Array,
+  statistics: Array
 })
 </script>
 
 
 <template>
-    <EmployeeComponent :staff="staff"/>
-     <!-- <TableTwo/> -->
+<EmployeeComponent v-bind="$props" />     <!-- <TableTwo/> -->
       <!-- {{ staff }} -->
 </template>
