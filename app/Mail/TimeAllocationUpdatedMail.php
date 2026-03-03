@@ -35,7 +35,7 @@ class TimeAllocationUpdatedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Activity Contribution Updated',
+            subject: " Activity Contribution Updated ".$this->currentYear
         );
     }
 
