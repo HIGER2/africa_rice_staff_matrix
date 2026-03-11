@@ -574,6 +574,7 @@ class AppController extends Controller
                 'supervisor'
             ])
             ->chunk(50, function ($employees) use ($currentYear,$delaySeconds) {
+
                 foreach ($employees as $employee) {
                     if ($employee->timeAllocations->isEmpty()) {
                         continue;
@@ -599,7 +600,6 @@ class AppController extends Controller
                     })->toArray();
 
                     $supervisorEmail = $employee->supervisor->email ?? null;
-
                     if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
                         $email = $employee->email;
                         $cc = $supervisorEmail;
@@ -615,6 +615,7 @@ class AppController extends Controller
                     $mail = Mail::to($email);
                     $bcc = config('mail.bcc');
                     $mail->bcc($bcc);
+                    
                     if ($cc) {
                         $mail->cc($cc);
                     }

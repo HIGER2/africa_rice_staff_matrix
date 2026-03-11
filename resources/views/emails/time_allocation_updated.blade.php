@@ -1,5 +1,5 @@
 @if ($receiver)
-    <h3>Hello  {{ $employee->name }},</h3>
+    <h3>Hello  {{ $employee['name'] }} {{ $employee['lastName'] }},</h3>
     <p>Your <strong>{{ $currentYear }}</strong>  Activity Contribution  has been updated.</p>
 @else
     <h2>Hello {{ $employee->supervisor->lastName }} {{ $employee->supervisor->name }},</h2>
