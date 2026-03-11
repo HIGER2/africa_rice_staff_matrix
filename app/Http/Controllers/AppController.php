@@ -506,7 +506,8 @@ class AppController extends Controller
 
             // Préparer et envoyer l'email
             $mail = Mail::to($email);
-            $mail->bcc(config('mail.bcc'));
+            $bcc = config('mail.bcc');
+            $mail->bcc($bcc);
             if ($cc) {
                 $mail->cc($cc);
             }
