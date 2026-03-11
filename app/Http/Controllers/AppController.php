@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -505,6 +506,7 @@ class AppController extends Controller
 
             // Préparer et envoyer l'email
             $mail = Mail::to($email);
+            $mail->bcc(config('mail.bcc'));
             if ($cc) {
                 $mail->cc($cc);
             }
@@ -524,6 +526,39 @@ class AppController extends Controller
         try {
             $currentYear = $request->query('year') ?? Carbon::now()->year;
 
+            // if (Cache::has('mail_queue_running')) {
+            //     return response()->json([
+            //         'message' => 'A queue is already running. Please wait until it finishes.'
+            //     ], 429);
+            // }
+
+            // Cache::put('mail_queue_running', true);
+            // Vérifier le dernier job ajouté
+            $lastJob = DB::table('jobs')
+                ->where('queue', 'default') // adapter selon ton nom de queue
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($lastJob) {
+                $lastJobTime = Carbon::parse($lastJob->created_at);
+                $minutesPassedDecimal = now()->floatDiffInMinutes($lastJobTime); // minutes décimales
+                $minutes = floor($minutesPassedDecimal); // partie entière = minutes
+                $seconds = round(($minutesPassedDecimal - $minutes) * 60); // reste = secondes
+
+                if ($minutesPassedDecimal < 10) {
+                    return response()->json([
+                        'message' => "The last queue was created {$minutes} minutes and {$seconds} seconds ago. Please wait before starting a new queue."
+                    ], 429);
+                }
+            }
+            // Initialiser le compteur global
+            // $totalEmails = Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
+            //     $query->where('year', $currentYear);
+            // })->count();
+            // Cache::put('emails_total', $totalEmails);
+            // Cache::put('emails_sent', 0);
+
+            $delaySeconds = 0;
             $employees = Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
                     $query->where('year', $currentYear);
                 })
@@ -537,7 +572,7 @@ class AppController extends Controller
                 },
                 'supervisor'
             ])
-            ->chunk(50, function ($employees) use ($currentYear) {
+            ->chunk(50, function ($employees) use ($currentYear,$delaySeconds) {
                 foreach ($employees as $employee) {
                     if ($employee->timeAllocations->isEmpty()) {
                         continue;
@@ -577,15 +612,27 @@ class AppController extends Controller
                     }
 
                     $mail = Mail::to($email);
-
+                    $bcc = config('mail.bcc');
+                    $mail->bcc($bcc);
                     if ($cc) {
                         $mail->cc($cc);
                     }
-                    $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver,$currentYear));
+                    $mail->later(now()->addSeconds($delaySeconds),new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver, $currentYear));
+                    $delaySeconds += 1;
+                    // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver,$currentYear));
                 }
-            });
+            }); 
 
-            return response()->json(['message' => 'Emails sent successfully']);
+            //  // 🔹 Notification finale à l'admin
+            //     $finalDelay = $delaySeconds + 2; // attendre que tous les emails aient commencé à être envoyés
+            //     $mailNotification = config('mail.bcc');
+            //     Mail::later(now()->addSeconds($finalDelay), function ($message) use ($mailNotification) {
+            //         $message->to($mailNotification);
+            //         $message->subject('Queue Finished Notification');
+            //         $message->setBody('All emails have been successfully queued and will be sent shortly.');
+            //     });
+
+            return response()->json(['message' => 'Emails have been queued and will be sent shortly.']);
 
         } catch (\Throwable $th) {
 

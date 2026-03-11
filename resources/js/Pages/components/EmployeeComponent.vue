@@ -138,7 +138,7 @@ import ImportFileComponent from './ImportFileComponent.vue'
             alert(response?.data?.message || 'Email sent successfully!')
         })
         .catch(error => {
-            // alert(error?.response.data?.message || error?.message)
+            alert(error?.response.data?.message || error?.message)
         })
         .finally(() => {
             emailLoading.value = false

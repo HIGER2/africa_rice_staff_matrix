@@ -34,6 +34,7 @@ return [
     |            "failover", "roundrobin"
     |
     */
+    'bcc' => env('MAIL_BCC'),
 
     'mailers' => [
 
