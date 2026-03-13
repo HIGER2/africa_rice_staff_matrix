@@ -401,18 +401,18 @@ class AppController extends Controller
             $employeeId = $request->employeeId;
             $currentYear = $request->query('year') ?? Carbon::now()->year;
             // $timeAllocation = $employee->timeAllocations()->where('year', date('Y'))->get();
-            $employee = Employee::select(
-                'employeeId',
-                'email',
-                'supervisorId',
-                'matricule as resno',
-                'firstName as name',
-                'lastName as lastName',
-                'bgLevel as grade_level',
-                'grade',
-                'phone2 as division',
-                'jobTitle as position'
-            )
+                $employee = Employee::select(
+                    'employeeId',
+                    'email',
+                    'supervisorId',
+                    'matricule as resno',
+                    'firstName',
+                    'lastName',
+                    'bgLevel as grade_level',
+                    'grade',
+                    'phone2 as division',
+                    'jobTitle as position'
+                )
                 ->with([
                     'timeAllocations' => function ($query) use ($currentYear) {
                         $query->whereYear('date', $currentYear)
@@ -526,14 +526,6 @@ class AppController extends Controller
     {
         try {
             $currentYear = $request->query('year') ?? Carbon::now()->year;
-
-            // if (Cache::has('mail_queue_running')) {
-            //     return response()->json([
-            //         'message' => 'A queue is already running. Please wait until it finishes.'
-            //     ], 429);
-            // }
-
-            // Cache::put('mail_queue_running', true);
             // Vérifier le dernier job ajouté
             $lastJob = DB::table('jobs')
                 ->where('queue', 'default') // adapter selon ton nom de queue
@@ -552,18 +544,24 @@ class AppController extends Controller
                     ], 429);
                 }
             }
-            // Initialiser le compteur global
-            // $totalEmails = Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
-            //     $query->where('year', $currentYear);
-            // })->count();
-            // Cache::put('emails_total', $totalEmails);
-            // Cache::put('emails_sent', 0);
 
             $delaySeconds = 0;
-            $employees = Employee::whereHas('timeAllocations', function($query) use ($currentYear) {
+            $employees = Employee::select(
+                    'employeeId',
+                    'email',
+                    'supervisorId',
+                    'matricule as resno',
+                    'firstName as name',
+                    'lastName as lastName',
+                    'bgLevel as grade_level',
+                    'grade',
+                    'phone2 as division',
+                    'jobTitle as position'
+                )
+                ->whereHas('timeAllocations', function($query) use ($currentYear) {
                     $query->where('year', $currentYear);
                 })
-            ->with([
+                ->with([
                 'timeAllocations' => function ($query) use ($currentYear) {
                     $query->orderBy('created_at', 'desc')
                     ->where('year', $currentYear);
@@ -574,7 +572,6 @@ class AppController extends Controller
                 'supervisor'
             ])
             ->chunk(50, function ($employees) use ($currentYear,$delaySeconds) {
-
                 foreach ($employees as $employee) {
                     if ($employee->timeAllocations->isEmpty()) {
                         continue;
@@ -600,6 +597,8 @@ class AppController extends Controller
                     })->toArray();
 
                     $supervisorEmail = $employee->supervisor->email ?? null;
+                    $email = null;
+                    $cc = null;
                     if (!empty($employee->email) && filter_var($employee->email, FILTER_VALIDATE_EMAIL)) {
                         $email = $employee->email;
                         $cc = $supervisorEmail;
@@ -613,6 +612,7 @@ class AppController extends Controller
                     }
 
                     $mail = Mail::to($email);
+
                     $bcc = config('mail.bcc');
                     $mail->bcc($bcc);
                     
@@ -621,18 +621,8 @@ class AppController extends Controller
                     }
                     $mail->later(now()->addSeconds($delaySeconds),new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver, $currentYear));
                     $delaySeconds += 1;
-                    // $mail->send(new TimeAllocationUpdatedMail($employee, $timeAllocations, $receiver,$currentYear));
                 }
             }); 
-
-            //  // 🔹 Notification finale à l'admin
-            //     $finalDelay = $delaySeconds + 2; // attendre que tous les emails aient commencé à être envoyés
-            //     $mailNotification = config('mail.bcc');
-            //     Mail::later(now()->addSeconds($finalDelay), function ($message) use ($mailNotification) {
-            //         $message->to($mailNotification);
-            //         $message->subject('Queue Finished Notification');
-            //         $message->setBody('All emails have been successfully queued and will be sent shortly.');
-            //     });
 
             return response()->json(['message' => 'Emails have been queued and will be sent shortly.']);
 
@@ -643,7 +633,6 @@ class AppController extends Controller
             ], 500);
         }
     }
-
     public function StaffTimeAllocations($id,$year = null)
     {
         $startYear = 2025;
@@ -727,7 +716,6 @@ class AppController extends Controller
         'year' => $years,   
         'data' => $employee]);
     }
-
 
     public function uploadAllocation(Request $request)
     {
